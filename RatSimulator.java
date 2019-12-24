@@ -33,6 +33,6 @@ public class RatSimulator {
             }
         }
         System.out.println("\n\nYou only manage to fend off a mere " + ratsKilled
-                + " rats.\n\nHumanity succumbs to the order of the rats.\n\n");
+                + " rats.\n\nHumanity succumbs to the order of the rats...\n\n");
     }
 }
