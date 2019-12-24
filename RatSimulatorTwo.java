@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
+import java.awt.event.MouseEvent;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,18 +16,19 @@ public class RatSimulatorTwo {
 
     JFrame window;
     JTextArea mainTextArea;
-    JPanel mainTextPanel, attackButtonPanel, statsPanel;
-    JLabel playerHPLabel, ratHPLabel, ratsKilledLabel;
+    JPanel mainTextPanel, attackButtonPanel, statsPanel, infoPanel;
+    JLabel playerHPLabel, playerMPLabel, ratsKilledLabel, turnLabel, infoLabel;
     Container con;
     JButton attackButton, magicButton, healButton;
     int playerATK, ratATK;
 
     int ratHP = 15;
-    int playerHP = 75;
-    int ratsKilled = 0;
+    int playerHP = 100;
+    int playerMaxHP = 100;
+    int playerMP = 10;
+    int playerMaxMP = 10;
+    int ratsKilled = 1;
     int turn = 1;
-
-    boolean dead;
 
     ChoiceHandler choiceHandler = new ChoiceHandler();
     Random rng = new Random();
@@ -46,6 +48,32 @@ public class RatSimulatorTwo {
         window.setLayout(null);
         window.setVisible(true);
         con = window.getContentPane();
+
+        statsPanel = new JPanel();
+        statsPanel.setBounds(76, 58, 630, 32);
+        statsPanel.setBackground(Color.black);
+        con.add(statsPanel);
+
+        playerHPLabel = new JLabel();
+        playerHPLabel.setForeground(Color.white);
+        statsPanel.add(playerHPLabel);
+        playerHPLabel.setText("HP: " + playerHP + " / " + playerMaxHP
+                + "                                                                                                                              ");
+
+        playerMPLabel = new JLabel();
+        playerMPLabel.setForeground(Color.white);
+        statsPanel.add(playerMPLabel);
+        playerMPLabel.setText("MP: " + playerMP + " / " + playerMaxMP);
+
+        infoPanel = new JPanel();
+        infoPanel.setBounds (150, 430, 482, 69);
+        infoPanel.setBackground(Color.black);
+        con.add(infoPanel);
+        
+        infoLabel = new JLabel();
+        infoLabel.setBounds (0, 0, 482, 69);
+        infoLabel.setForeground(Color.white);
+        infoPanel.add(infoLabel);
 
         mainTextPanel = new JPanel();
         mainTextPanel.setBounds(76, 100, 630, 250);
@@ -73,18 +101,48 @@ public class RatSimulatorTwo {
         attackButtonPanel.add(attackButton);
         attackButton.setFocusPainted(false);
         attackButton.addActionListener(choiceHandler);
+        attackButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                attackButton.setBackground(Color.red);
+                infoLabel.setText("( " + ( 7 + (2*ratsKilled)) + " - " + 5 * ratsKilled + "  damage )");
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                attackButton.setBackground(Color.black);
+                infoLabel.setText("");
+            }
+        });
+
         magicButton = new JButton("Magic");
         magicButton.setBackground(Color.black);
         magicButton.setForeground(Color.white);
         attackButtonPanel.add(magicButton);
         magicButton.setFocusPainted(false);
         magicButton.addActionListener(choiceHandler);
+        magicButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                magicButton.setBackground(Color.blue);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                magicButton.setBackground(Color.black);
+            }
+        });
         healButton = new JButton("Heal");
         healButton.setBackground(Color.black);
         healButton.setForeground(Color.white);
         attackButtonPanel.add(healButton);
         healButton.setFocusPainted(false);
         healButton.addActionListener(choiceHandler);
+        healButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                healButton.setBackground(Color.green);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                healButton.setBackground(Color.black);
+            }
+        });
 
     }
 
@@ -93,7 +151,9 @@ public class RatSimulatorTwo {
         if (ratHP <= 0) {
 
             ratHP = rng.nextInt(37) + 5 + (2 * ratsKilled);
-            playerHP = playerHP + 25;
+            playerMaxHP = (playerMaxHP + 25) + ratsKilled;
+            playerMaxMP = playerMaxMP + 1;
+
             ratsKilled++;
 
             mainTextArea.setText("\nA new rat appears with " + ratHP + " HP!");
@@ -101,22 +161,42 @@ public class RatSimulatorTwo {
 
         else if (ratHP > 0) {
 
-            int ratATK = rng.nextInt(3) * ratsKilled + (2 * ratsKilled) + 1;
+            int ratATK = rng.nextInt(3) * ratsKilled + (2 * ratsKilled) + 2;
             int playerATK = rng.nextInt((3) + 2 * ratsKilled) + 7;
 
+            playerMP++;
             turn++;
 
             playerHP = playerHP - ratATK;
             ratHP = ratHP - playerATK;
 
-            mainTextArea.setText("\nYou attack the rat for " + playerATK + " damage!\n\nThe rat (#" + ratsKilled
-                    + ") remains with " + ratHP + " HP.\n\n\n\nThe rat retaliates with " + ratATK
-                    + " damage!\n\nYou have " + playerHP + " HP now.\n\n\n\nTurn:" + turn);
+            playerHPLabel.setText("HP: " + playerHP + " / " + playerMaxHP
+                    + "                                                                                                                              ");
+            playerMPLabel.setText("MP: " + playerMP + " / " + playerMaxMP);
+
+            if (ratHP < 0) {
+                ratHP = 0;
+
+                mainTextArea.setText("\nYou attack the rat for " + playerATK + " damage!\n\nThe rat (#" + ratsKilled
+                        + ") dies.\n\n\n\nThe rat retaliates with " + ratATK + " damage!\n\nYou have " + playerHP + "/"
+                        + playerMaxHP + " HP now.\n\n\n\nTurn:" + turn);
+
+            }
+
+            else {
+
+                mainTextArea.setText("\nYou attack the rat for " + playerATK + " damage!\n\nThe rat (#" + ratsKilled
+                        + ") remains with " + ratHP + " HP.\n\n\n\nThe rat retaliates with " + ratATK
+                        + " damage!\n\nYou have " + playerHP + "/" + playerMaxHP + " HP now.\n\n\n\nTurn:" + turn);
+
+            }
 
         }
 
         while (playerHP < 0) {
 
+            playerHPLabel.setText("You Have Fallen To The Rats");
+            playerMPLabel.setText("");
             attackButtonPanel.setVisible(false);
             mainTextArea.setText("\nYou died.\n\n\nYou only manage to fend off a mere " + ratsKilled
                     + " rats.\n\n\n\n\n\n\n\nHumanity succumbs to the order of the rats.");
@@ -130,7 +210,8 @@ public class RatSimulatorTwo {
         if (ratHP <= 0) {
 
             ratHP = rng.nextInt(37) + 5 + (2 * ratsKilled);
-            playerHP = playerHP + 25;
+            playerMaxHP = (playerMaxHP + 25) + ratsKilled;
+            playerMaxMP = playerMaxMP + 1;
             ratsKilled++;
 
             mainTextArea.setText("\nA new rat appears with " + ratHP + " HP!");
@@ -139,21 +220,38 @@ public class RatSimulatorTwo {
         else if (ratHP > 0) {
 
             int ratATK = rng.nextInt(3) * ratsKilled + (2 * ratsKilled) + 1;
-            int playerATK = rng.nextInt(9) * ratsKilled + 3;
+            int playerATK = rng.nextInt(11) * ratsKilled + (3 * ratsKilled) + turn;
+
+            playerMP = playerMP - 4;
 
             turn++;
 
             playerHP = playerHP - ratATK;
             ratHP = ratHP - playerATK;
 
-            mainTextArea.setText("\nYou conjure a spell against the rat for " + playerATK + " damage!\n\nThe rat (#"
-                    + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe rat retaliates with " + ratATK
-                    + " damage!\n\nYou have " + playerHP + " HP now.\n\n\n\nTurn:" + turn);
+            playerHPLabel.setText("HP: " + playerHP + " / " + playerMaxHP
+                    + "                                                                                                                              ");
+            playerMPLabel.setText("MP: " + playerMP + " / " + playerMaxMP);
 
+            if (ratHP < 0) {
+                ratHP = 0;
+
+                mainTextArea.setText("\nYou conjure a spell against the rat for " + playerATK + " damage!\n\nThe rat (#"
+                        + ratsKilled + ") dies.\n\n\n\nThe rat retaliates with " + ratATK + " damage!\n\nYou have "
+                        + playerHP + "/" + playerMaxHP + " HP now.\n\n\n\nTurn:" + turn);
+            } else {
+
+                mainTextArea.setText("\nYou conjure a spell against the rat for " + playerATK + " damage!\n\nThe rat (#"
+                        + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe rat retaliates with " + ratATK
+                        + " damage!\n\nYou have " + playerHP + "/" + playerMaxHP + " HP now.\n\n\n\nTurn:" + turn);
+
+            }
         }
 
         while (playerHP < 0) {
 
+            playerHPLabel.setText("You Have Fallen To The Rats");
+            playerMPLabel.setText("");
             attackButtonPanel.setVisible(false);
             mainTextArea.setText("\nYou died.\n\n\nYou only manage to fend off a mere " + ratsKilled
                     + " rats.\n\n\n\n\n\n\n\nHumanity succumbs to the order of the rats.");
@@ -167,7 +265,8 @@ public class RatSimulatorTwo {
         if (ratHP <= 0) {
 
             ratHP = rng.nextInt(37) + 5 + (2 * ratsKilled);
-            playerHP = playerHP + 25;
+            playerMaxHP = (playerMaxHP + 25) + ratsKilled;
+            playerMaxMP = playerMaxMP + 1;
             ratsKilled++;
 
             mainTextArea.setText("\nA new rat appears with " + ratHP + " HP!");
@@ -176,9 +275,21 @@ public class RatSimulatorTwo {
         else if (ratHP > 0) {
 
             int ratATK = rng.nextInt(3) * ratsKilled + (2 * ratsKilled) + 1;
-            int playerHPHealed = rng.nextInt(4) * ratsKilled + ratsKilled + 5;
+            int playerHPHealed = rng.nextInt((4) * 10) + turn + ratsKilled;
 
-            playerHP = playerHP + playerHPHealed;
+            if (playerHP < playerMaxHP) {
+
+                playerHP = playerHP + playerHPHealed;
+
+            }
+
+            while (playerHP > playerMaxHP) {
+
+                playerHP = playerMaxHP;
+
+            }
+
+            playerMP = playerMP - 2;
 
             playerATK = 0;
 
@@ -187,13 +298,19 @@ public class RatSimulatorTwo {
             playerHP = playerHP - ratATK;
             ratHP = ratHP - playerATK;
 
+            playerHPLabel.setText("HP: " + playerHP + " / " + playerMaxHP
+                    + "                                                                                                                              ");
+            playerMPLabel.setText("MP: " + playerMP + " / " + playerMaxMP);
+
             mainTextArea.setText("\nYou heal yourself for " + playerHPHealed + " HP!\n\nThe rat (#" + ratsKilled
                     + ") remains with " + ratHP + " HP.\n\n\n\nThe rat retaliates with " + ratATK
-                    + " damage!\n\nYou have " + playerHP + " HP now.\n\n\n\nTurn:" + turn);
+                    + " damage!\n\nYou have " + playerHP + "/" + playerMaxHP + " HP now.\n\n\n\nTurn:" + turn);
 
         }
 
-        while (playerHP < 0) {
+        while (playerHP < 0)
+
+        {
 
             attackButtonPanel.setVisible(false);
             mainTextArea.setText("\nYou died.\n\n\nYou only manage to fend off a mere " + ratsKilled
@@ -201,6 +318,14 @@ public class RatSimulatorTwo {
             break;
         }
 
+    }
+
+    public void mouseEntered(MouseEvent e) {
+        saySomething("Mouse entered", e);
+    }
+
+    public void mouseExited(MouseEvent e) {
+        saySomething("Mouse exited", e);
     }
 
     public class ChoiceHandler implements ActionListener {
