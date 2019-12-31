@@ -1,5 +1,5 @@
+
 import java.util.Random;
-import java.util.ArrayList;
 
 import java.lang.Math;
 
@@ -8,13 +8,11 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
-import javax.swing.BoxLayout;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
-import java.awt.GridLayout;
 
 public class RatSimulatorTwo {
 
@@ -23,13 +21,14 @@ public class RatSimulatorTwo {
     JPanel mainTextPanel, attackButtonPanel, statsPanel, descriptionPanel;
     JLabel statsLabel, descriptionLabel;
     Container con;
-    JButton attackButton, magicButton, healButton, backButton, shopButton, buyPotionButton, leaveButton, continueButton;
+    JButton attackButton, magicButton, healButton, backButton, shopButton, leaveButton, continueButton;
     int playerATK, ratATK, ratGold, shopRNG;
 
     // Battle data
     String playerWeapon = "Nothing";
     String playerWeaponVerbForButton = "Attack";
     String playerWeaponVerb = "attack";
+    String ratAttackDescription;
     boolean magicKill;
     int ratHP = 15;
     int playerHP = 100;
@@ -39,17 +38,25 @@ public class RatSimulatorTwo {
     int ratsKilled = 1;
     int turn = 1;
     int ratRNG = 0;
-    int playerGold = 100;
+    int playerGold = 0;
 
     // Inventory data
-    JButton inventoryButton, usePotionButton, usePistolButton, buyPistolButton;
+    JButton inventoryButton, usePotionButton, buyPotionButton, buyMushroomButton, useMushroomButton, buyTendyButton, useTendyButton, buyPencilButton, usePencilButton, usePistolButton, buyPistolButton, buyHatButton, useHatButton;
     JPanel inventoryPanel, shopDescriptionPanel;
     JLabel shopDescriptionLabel;
     boolean inventoryOpen = false;
+    boolean ownPencil;
     boolean ownPistol;
+    boolean ownHat;
     int potionCount = 0;
     int potionCost;
+    int mushroomCount = 0;
+    int mushroomCost;
+    int tendyCount = 0;
+    int tendyCost;
+    int pencilCost;
     int pistolCost;
+    int hatCost;
 
     ChoiceHandler choiceHandler = new ChoiceHandler();
     Random rng = new Random();
@@ -81,7 +88,7 @@ public class RatSimulatorTwo {
         updateStats();
 
         inventoryPanel = new JPanel();
-        inventoryPanel.setBounds(170, 460, 442, 50);
+        inventoryPanel.setBounds(50, 460, 700, 80);
         inventoryPanel.setBackground(Color.black);
         con.add(inventoryPanel);
 
@@ -126,16 +133,20 @@ public class RatSimulatorTwo {
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
                 if (playerWeapon == "Nothing") {
                     descriptionLabel.setText("( " + 10 + " - " + 20 + "  damage )");
+                } else if (playerWeapon == "Pencil") {
+                    descriptionLabel.setText("( " + 30 + " - " + 45 + "  damage )");
                 } else if (playerWeapon == "Pistol") {
-                    descriptionLabel.setText("( " + 60 + " - " + 100 + "  damage )");
+                    descriptionLabel.setText("( " + 110 + " - " + 140 + "  damage )");
                 }
             }
 
             public void mouseClicked(final java.awt.event.MouseEvent evt) {
                 if (playerWeapon == "Nothing") {
                     descriptionLabel.setText("( " + 10 + " - " + 20 + "  damage )");
+                } else if (playerWeapon == "Pencil") {
+                    descriptionLabel.setText("( " + 30 + " - " + 45 + "  damage )");
                 } else if (playerWeapon == "Pistol") {
-                    descriptionLabel.setText("( " + 60 + " - " + 100 + "  damage )");
+                    descriptionLabel.setText("( " + 110 + " - " + 140 + "  damage )");
                 }
             }
 
@@ -183,7 +194,7 @@ public class RatSimulatorTwo {
                     descriptionLabel.setText("You don't have enough mana!  You need atleast "
                             + (2 + (Math.round(ratsKilled / 8))) + " MP to cast Heal.");
                 } else {
-                    descriptionLabel.setText("( " + turn + " - " + turn + "  HP )\n\n  Requires : "
+                    descriptionLabel.setText("( " + (turn + 25) + " - " + (turn + 25) + "  HP )\n\n  Requires : "
                             + (2 + (Math.round(ratsKilled / 8))) + " MP");
                 }
             }
@@ -193,7 +204,7 @@ public class RatSimulatorTwo {
                     descriptionLabel.setText("You don't have enough mana!  You need atleast "
                             + (2 + (Math.round(ratsKilled / 8))) + " MP to cast Heal.");
                 } else {
-                    descriptionLabel.setText("( " + turn + " - " + turn + "  HP )\n\n  Requires : "
+                    descriptionLabel.setText("( " + (turn + 25) + " - " + (turn + 25) + "  HP )\n\n  Requires : "
                             + (2 + (Math.round(ratsKilled / 8))) + " MP");
                 }
             }
@@ -277,7 +288,183 @@ public class RatSimulatorTwo {
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                if (potionCount > 0){
                 descriptionLabel.setText("A yellow rat-shaped potion you bought from a rat.");
+                }
+                else{
+                    descriptionLabel.setText("You don't have any potions.");
+                }
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        buyMushroomButton = new JButton();
+        buyMushroomButton.setBackground(Color.black);
+        buyMushroomButton.setForeground(Color.white);
+        buyMushroomButton.setText("Mushroom - " + mushroomCost + "G");
+        buyMushroomButton.setFocusPainted(false);
+        buyMushroomButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                buyMushroom();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("An unnatural looking fungi.");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("");
+            }
+        });
+
+        useMushroomButton = new JButton();
+        useMushroomButton.setBackground(Color.black);
+        useMushroomButton.setForeground(Color.white);
+        useMushroomButton.setText("Mushroom (x " + mushroomCount + ")");
+        useMushroomButton.setFocusPainted(false);
+        useMushroomButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                useMushroom();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                if (mushroomCount > 0){
+                descriptionLabel.setText("A slender mushroom that looks like it might kill you if you eat it.");
+                }
+                else{
+                    descriptionLabel.setText("You don't have any mushrooms.");
+                }
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        buyTendyButton = new JButton();
+        buyTendyButton.setBackground(Color.black);
+        buyTendyButton.setForeground(Color.white);
+        buyTendyButton.setText("Tendy - " + tendyCost + "G");
+        buyTendyButton.setFocusPainted(false);
+        buyTendyButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                buyTendy();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("A tendy made from an unidentifiable meat.");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("");
+            }
+        });
+
+        useTendyButton = new JButton();
+        useTendyButton.setBackground(Color.black);
+        useTendyButton.setForeground(Color.white);
+        useTendyButton.setText("Tendy (x " + tendyCount + ")");
+        useTendyButton.setFocusPainted(false);
+        useTendyButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                useTendy();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                if (tendyCount > 0){
+                descriptionLabel.setText("A big juicy tendy with a nice crunch to it.");
+                }
+                else {
+                    descriptionLabel.setText("You don't have any tendies.");
+                }
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        buyPencilButton = new JButton();
+        buyPencilButton.setBackground(Color.black);
+        buyPencilButton.setForeground(Color.white);
+        buyPencilButton.setText("Pencil");
+        buyPencilButton.setFocusPainted(false);
+        buyPencilButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                buyPencil();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("A yellow pencil with bite marks on it. Looks good for stabbing rats.");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("");
+            }
+        });
+
+        usePencilButton = new JButton();
+        usePencilButton.setBackground(Color.black);
+        usePencilButton.setForeground(Color.white);
+        usePencilButton.setText("Pencil");
+        usePencilButton.setFocusPainted(false);
+        usePencilButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                usePencil();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                if (playerWeapon == "Pencil") {
+                    descriptionLabel.setText("(EQUIPPED) A freshy sharpened No. 2 pencil.");
+                } else {
+                    descriptionLabel.setText("A freshly sharpened No. 2 pencil.");
+                }
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        buyPistolButton = new JButton();
+        buyPistolButton.setBackground(Color.black);
+        buyPistolButton.setForeground(Color.white);
+        buyPistolButton.setText("Pistol");
+        buyPistolButton.setFocusPainted(false);
+        buyPistolButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                buyPistol();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("A pistol with the engraving \"Polar Star\".");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                shopDescriptionLabel.setText("");
+            }
+        });
+
+        usePistolButton = new JButton();
+        usePistolButton.setBackground(Color.black);
+        usePistolButton.setForeground(Color.white);
+        usePistolButton.setText("Pistol");
+        usePistolButton.setFocusPainted(false);
+        usePistolButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                usePistol();
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                if (playerWeapon == "Pistol") {
+                    descriptionLabel.setText(
+                            "(EQUIPPED) Upon further inspection, you notice another engraving \"Mrs. Wagner\".");
+                } else {
+                    descriptionLabel.setText("A pistol.");
+                }
             }
 
             public void mouseExited(final java.awt.event.MouseEvent evt) {
@@ -352,10 +539,15 @@ public class RatSimulatorTwo {
         else if (ratHP > 0) {
             generateRatATK();
             if (playerWeapon == "Nothing") {
-                playerATK = 10 * (rng.nextInt(2) + 1);
+                playerATK = (rng.nextInt(11) + 10);
                 playerMP++;
+            } else if (playerWeapon == "Pencil") {
+                playerATK = (rng.nextInt(16) + 30);
             } else if (playerWeapon == "Pistol") {
-                playerATK = 20 * (rng.nextInt(3) + 3);
+                playerATK = (rng.nextInt(31) + 110);
+            }
+            if (playerMP > playerMaxMP) {
+                playerMP = playerMaxMP;
             }
 
             // Increase turn count by 1, and calculate damage done to rat
@@ -366,12 +558,13 @@ public class RatSimulatorTwo {
             // updated. Battle message is displayed
             if (ratHP > 0) {
 
-                playerHP = playerHP;
+                playerHP = playerHP - ratATK;
                 updateStats();
 
                 mainTextArea.setText("\nYou " + playerWeaponVerb + " the " + ratNames() + "rat for " + playerATK
                         + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") remains with " + ratHP
-                        + " HP.\n\n\n\nThe rat retaliates with " + ratATK + " damage!");
+                        + " HP.\n\n\n\nThe " + ratNames() + "rat " + ratAttackDescription + " for " + ratATK
+                        + " damage!");
             }
 
             // Else if Rat is killed by players attack, increase player's max stats, update
@@ -421,8 +614,9 @@ public class RatSimulatorTwo {
                 updateStats();
 
                 mainTextArea.setText("\nYou conjure a spell against the " + ratNames() + "rat for " + playerATK
-                        + " damage!\n\n\n\nThe rat (# " + ratsKilled + ") remains with " + ratHP
-                        + " HP.\n\n\n\nThe rat retaliates with " + ratATK + " damage!");
+                        + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") remains with " + ratHP
+                        + " HP.\n\n\n\nThe " + ratNames() + "rat " + ratAttackDescription + " for " + ratATK
+                        + " damage!");
             }
 
             // Else if Rat is killed by players attack, increase player's max stats, update
@@ -476,9 +670,9 @@ public class RatSimulatorTwo {
             turn++;
             playerHP = playerHP - ratATK;
             updateStats();
-            mainTextArea.setText(
-                    "\nYou heal yourself for " + playerHPHealed + " HP!\n\n\nThe " + ratNames() + "rat (# " + ratsKilled
-                            + ") remains with " + ratHP + " HP.\n\n\n\nThe rat retaliates with " + ratATK + " damage!");
+            mainTextArea.setText("\nYou heal yourself for " + playerHPHealed + " HP!\n\n\nThe " + ratNames() + "rat (# "
+                    + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe " + ratNames() + "rat "
+                    + ratAttackDescription + " for " + ratATK + " damage!");
         }
 
         // If rat isnt killed by player attack, and player's HP goes below 0 after
@@ -501,7 +695,7 @@ public class RatSimulatorTwo {
     public void openInventory() {
         inventoryOpen = true;
         inventoryPanel.setVisible(true);
-        if ((potionCount == 0) && (ownPistol == false)) {
+        if ((potionCount == 0) && (mushroomCount == 0) && (tendyCount == 0) && (ownPencil == false) && (ownPistol == false)) {
             descriptionLabel.setText("You have nothing in your inventory...");
         }
         if (potionCount != 0) {
@@ -509,6 +703,21 @@ public class RatSimulatorTwo {
             usePotionButton.setVisible(true);
         } else {
             usePotionButton.setVisible(false);
+        }
+        if (mushroomCount != 0) {
+            useMushroomButton.setText("Mushroom (x " + mushroomCount + ")");
+            useMushroomButton.setVisible(true);
+        } else {
+            useMushroomButton.setVisible(false);
+            if (tendyCount != 0) {
+                useTendyButton.setText("Tendy (x " + tendyCount + ")");
+                useTendyButton.setVisible(true);
+            } else {
+                useTendyButton.setVisible(false);
+            }
+        }
+        if (ownPencil == true) {
+            usePencilButton.setVisible(true);
         }
         if (ownPistol == true) {
             usePistolButton.setVisible(true);
@@ -535,8 +744,8 @@ public class RatSimulatorTwo {
 
         ratHP = 0;
         ratATK = 0;
-        playerMaxHP = (playerMaxHP + 15) + ratsKilled / 2;
-        playerHP = (playerHP + 10) + ratsKilled / 4;
+        playerMaxHP = (playerMaxHP + 15) + ratsKilled / 4;
+        playerHP = (playerHP + 15) + ratsKilled / 4;
         playerMaxMP = playerMaxMP + 1;
         playerMP = playerMP + 1;
         if (playerHP > playerMaxHP) {
@@ -553,10 +762,10 @@ public class RatSimulatorTwo {
     // Generates what rat will appear, display message
     public void generateRat() {
 
-        ratRNG = (2 * ratsKilled) + (rng.nextInt(31));
+        ratGold = 1 + (rng.nextInt(4) * ratsKilled / 6);
 
+        ratRNG = (3 * ratsKilled) + (rng.nextInt(31));
         mainTextArea.setText("\nA " + rats() + "rat appears with " + ratHP + " HP!\n\n\n\n\n\n\n\n\nWhat will you do?");
-        ratGold = 1 + rng.nextInt(3) * ratsKilled / 7;
 
     }
 
@@ -578,10 +787,19 @@ public class RatSimulatorTwo {
         inventoryOpen = false;
 
         potionCost = 5;
-        potionCost = rng.nextInt(4) + (potionCost + (ratsKilled / 5)) - 3;
+        potionCost = rng.nextInt(4) + (potionCost + (ratsKilled / 15)) - 3;
 
-        pistolCost = 30;
-        pistolCost = rng.nextInt(10) + pistolCost - (5 + (ratsKilled / 5));
+        mushroomCost = 21;
+        mushroomCost = rng.nextInt(7) + (mushroomCost + (ratsKilled / 10)) - 6;
+
+        tendyCost = 30;
+        tendyCost = rng.nextInt(3) + (tendyCost + (ratsKilled / 10)) - 2;;
+
+        pencilCost = 20;
+        pencilCost = rng.nextInt(10) + pencilCost - 5;
+
+        pistolCost = 70;
+        pistolCost = rng.nextInt(10) + pistolCost - 5;
 
     }
 
@@ -594,13 +812,91 @@ public class RatSimulatorTwo {
         shopDescriptionPanel.setVisible(true);
         shopDescriptionLabel.setVisible(true);
         descriptionPanel.add(buyPotionButton);
+        descriptionPanel.add(buyMushroomButton);
+        descriptionPanel.add(buyTendyButton);
+        descriptionPanel.add(buyPencilButton);
         descriptionPanel.add(buyPistolButton);
         buyPotionButton.setText("Potion - " + potionCost + "G");
         buyPotionButton.setVisible(true);
-        buyPistolButton.setText("Pistol - " + pistolCost + "G");
-        buyPistolButton.setVisible(true);
+
+        if (ownPencil == false) {
+            buyPencilButton.setText("Pencil - " + pencilCost + "G");
+            buyPencilButton.setVisible(true);
+            buyMushroomButton.setVisible(false);
+            buyTendyButton.setVisible(false);
+            buyPistolButton.setVisible(false);
+        } else {
+            buyPencilButton.setVisible(true);
+        }
+        if (ownPencil == true) {
+            buyMushroomButton.setVisible(true);
+            buyTendyButton.setVisible(true);
+            buyPencilButton.setVisible(false);
+            buyPistolButton.setVisible(true);
+            if (ownPistol == false) {
+                buyPistolButton.setText("Pistol - " + pistolCost + "G");
+                buyPistolButton.setVisible(true);
+            } else {
+                buyPistolButton.setVisible(false);
+            }
+
+        } else {
+            buyMushroomButton.setText("Mushroom - " + mushroomCost + "G");
+            buyMushroomButton.setVisible(false);
+            buyTendyButton.setText("Tendy - " + tendyCost + "G");
+            buyTendyButton.setVisible(false);
+            buyPistolButton.setVisible(false);
+            
+        }
         shopButton.setVisible(false);
 
+    }
+
+    public void buyPencil() {
+
+        if (playerGold >= pencilCost) {
+            if (ownPencil == false) {
+                inventoryPanel.add(usePencilButton);
+                usePencilButton.setVisible(false);
+                playerGold = playerGold - pencilCost;
+                ownPencil = true;
+                mainTextArea.setText("\nSqueek Squeek Squeek.\n(Fine transaction, human.\n\n\n\n\n\nRemember to equip new weapons!");
+                updateStats();
+            } else {
+                mainTextArea.setText("\nSqueek Squeek.\n(All out of stock, human.)");
+            }
+        } else if (playerGold == 0) {
+            mainTextArea.setText(
+                    "\nSqueek Squeek Squeek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
+        } else if (playerGold < pencilCost) {
+            mainTextArea.setText("\nSqueek.\nPoor human. Pitiful.");
+
+        } else {
+            leaveShop();
+        }
+    }
+
+    public void usePencil() {
+
+        if (playerWeapon != "Pencil") {
+
+            playerWeapon = "Pencil";
+            playerWeaponVerbForButton = "Stab";
+            playerWeaponVerb = "stab";
+            attackButton.setText(playerWeaponVerbForButton);
+            usePencilButton.setText("Equipped: Pencil");
+            usePistolButton.setText("Pistol");
+            descriptionLabel.setText("(EQUIPPED) A freshy sharpened No. 2 pencil.");
+        } else {
+            playerWeapon = "Nothing";
+            playerWeaponVerbForButton = "Attack";
+            playerWeaponVerb = "attack";
+            attackButton.setText(playerWeaponVerbForButton);
+            usePencilButton.setText("Pencil");
+            descriptionLabel.setText("A freshly sharpened No. 2 pencil.");
+
+            usePistolButton.setText("Pistol");
+        }
     }
 
     public void buyPistol() {
@@ -614,13 +910,13 @@ public class RatSimulatorTwo {
                 mainTextArea.setText("\nSqueek Squeek Squeek.\n(Aye, a fine pistol. Enjoy the transaction, human.)");
                 updateStats();
             } else {
-                mainTextArea.setText("\nSqueek Squeek\n(All out of stock, human.)");
+                mainTextArea.setText("\nSqueek Squeek.\n(All out of stock, human.)");
             }
         } else if (playerGold == 0) {
             mainTextArea.setText(
-                    "\nSqueek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
+                    "\nSqueek Squeek Squeek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
         } else if (playerGold < pistolCost) {
-            mainTextArea.setText("\nSqueek\nPoor human. Pitiful.");
+            mainTextArea.setText("\nSqueek.\nPoor human. Pitiful.");
 
         } else {
             leaveShop();
@@ -635,9 +931,9 @@ public class RatSimulatorTwo {
             playerWeaponVerbForButton = "Shoot";
             playerWeaponVerb = "shoot";
             attackButton.setText(playerWeaponVerbForButton);
+            usePencilButton.setText("Pencil");
             usePistolButton.setText("Equipped: Pistol");
-            descriptionLabel
-                    .setText("(EQUIPPED) Upon further inspection, you notice another engraving \"Mrs. Wagner\".");
+            descriptionLabel.setText("(EQUIPPED) A pistol.");
         } else {
             playerWeapon = "Nothing";
             playerWeaponVerbForButton = "Attack";
@@ -645,6 +941,8 @@ public class RatSimulatorTwo {
             attackButton.setText(playerWeaponVerbForButton);
             usePistolButton.setText("Pistol");
             descriptionLabel.setText("A pistol.");
+
+            usePencilButton.setText("Pencil");
         }
     }
 
@@ -660,9 +958,9 @@ public class RatSimulatorTwo {
             updateStats();
         } else if (playerGold == 0) {
             mainTextArea.setText(
-                    "\nSqueek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
+                    "\nSqueek Squeek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
         } else if (playerGold < potionCost) {
-            mainTextArea.setText("\nPoor human. Pitiful.");
+            mainTextArea.setText("\nSqueek Squeek.\nPoor human. Pitiful.");
 
         } else {
             leaveShop();
@@ -673,7 +971,7 @@ public class RatSimulatorTwo {
         if (potionCount >= 1) {
             potionCount = potionCount - 1;
             playerHP = playerHP + 50;
-            playerMP = playerMP + 5;
+            playerMP = playerMP + 3;
             if (playerHP > playerMaxHP) {
                 playerHP = playerMaxHP;
             }
@@ -683,9 +981,87 @@ public class RatSimulatorTwo {
             usePotionButton.setText("Potion (x " + potionCount + ")");
             updateStats();
             descriptionLabel.setText(
-                    "\nYou drink a rat's strange yellow concotion and feel tingly... " + "You restore 50 HP and 5 MP!");
+                    "\nYou drink a rat's strange yellow concotion and feel tingly... " + "You restore 50 HP and 3 MP!");
         } else {
             descriptionLabel.setText("You don't have any potions");
+        }
+    }
+
+    public void buyMushroom() {
+
+        if (playerGold >= mushroomCost) {
+            inventoryPanel.add(useMushroomButton);
+            useMushroomButton.setVisible(false);
+            playerGold = playerGold - mushroomCost;
+            mushroomCount = mushroomCount + 1;
+            mainTextArea.setText("\nSqueek Squeek Squeek.\n(Enjoy the transaction, human.)\n\n\nYou now have "
+                    + mushroomCount + " mushrooms");
+            updateStats();
+        } else if (playerGold == 0) {
+            mainTextArea.setText(
+                    "\nSqueek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
+        } else if (playerGold < mushroomCost) {
+            mainTextArea.setText("\nSqueek.\nPoor human. Pitiful.");
+
+        } else {
+            leaveShop();
+        }
+    }
+
+    public void useMushroom() {
+        if (mushroomCount >= 1) {
+            mushroomCount = mushroomCount - 1;
+            playerHP = playerHP - 125;
+            playerMP = playerMP + 15;
+            if (playerHP <= 0) {
+                die();
+            }
+            if (playerMP > playerMaxMP) {
+                playerMP = playerMaxMP;
+            }
+            useMushroomButton.setText("Mushroom (x " + mushroomCount + ")");
+            updateStats();
+            descriptionLabel
+                    .setText("\nYou chew and swallow the vile mushroom " + "You lose 125 HP but restore 15 MP.");
+        } else {
+            descriptionLabel.setText("You don't have any mushrooms");
+        }
+    }
+
+    public void buyTendy() {
+
+        if (playerGold >= tendyCost) {
+            inventoryPanel.add(useTendyButton);
+            useTendyButton.setVisible(false);
+            playerGold = playerGold - tendyCost;
+            tendyCount = tendyCount + 1;
+            mainTextArea.setText("\nSqueek Squeek Squeek.\n(Enjoy the transaction, human.)\n\n\nYou now have "
+                    + tendyCount + " tendies");
+            updateStats();
+        } else if (playerGold == 0) {
+            mainTextArea.setText(
+                    "\nSqueek Squeek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
+        } else if (playerGold < tendyCost) {
+            mainTextArea.setText("\nSqueek Squeek.\nPoor human. Pitiful.");
+
+        } else {
+            leaveShop();
+        }
+    }
+
+    public void useTendy() {
+        if (tendyCount >= 1) {
+            tendyCount = tendyCount - 1;
+            playerHP = playerHP + 500;
+            if (playerHP > playerMaxHP) {
+                playerHP = playerMaxHP;
+            }
+            useTendyButton.setText("Tendy (x " + tendyCount + ")");
+            updateStats();
+            descriptionLabel.setText(
+                    "\nYou eat the crispy, crunchy, juicy tendy. You restore 500 HP!");
+        } else {
+            descriptionLabel.setText("You don't have any tendies");
         }
     }
 
@@ -702,6 +1078,9 @@ public class RatSimulatorTwo {
         inventoryButton.setVisible(false);
         continueButton.setVisible(true);
         buyPotionButton.setVisible(false);
+        buyMushroomButton.setVisible(false);
+        buyTendyButton.setVisible(false);
+        buyPencilButton.setVisible(false);
         buyPistolButton.setVisible(false);
         shopRNG = 1;
 
@@ -712,13 +1091,13 @@ public class RatSimulatorTwo {
 
         if (magicKill == true) {
             mainTextArea.setText("\nYou conjure a spell against the " + ratNames() + "rat for " + playerATK
-                    + " damage!\n\n\n\nThe rat (# " + ratsKilled + ") dies and drops " + ratGold
-                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 2))
+                    + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") dies and drops " + ratGold
+                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 4))
                     + "!\n\nYour max MP increases by 1!");
         } else if (magicKill == false) {
             mainTextArea.setText("\nYou " + playerWeaponVerb + " the " + ratNames() + "rat for " + playerATK
-                    + " damage!\n\n\n\nThe rat (# " + ratsKilled + ") dies and drops " + ratGold
-                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 2))
+                    + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") dies and drops " + ratGold
+                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 4))
                     + "!\n\nYour max MP increases by 1!");
         } else {
             mainTextArea.setText("you killed the rat");
@@ -732,7 +1111,7 @@ public class RatSimulatorTwo {
         inventoryButton.setVisible(false);
         continueButton.setVisible(true);
 
-        shopRNG = rng.nextInt(24);
+        shopRNG = rng.nextInt(4);
 
     }
 
@@ -754,340 +1133,411 @@ public class RatSimulatorTwo {
         if ((ratRNG >= 5) && (ratRNG < 10)) {
             // HP 1, ATK 1 == 2
             ratHP = rng.nextInt(10) + (1 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            ratAttackDescription = "nips you";
             return "baby ";
         } else if ((ratRNG >= 10) && (ratRNG < 15)) {
             // HP 2, ATK 2 == 4
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratAttackDescription = "lightly bites you";
             return "weak ";
         } else if ((ratRNG >= 15) && (ratRNG < 20)) {
             // HP 2, ATK 3 == 5
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratAttackDescription = "quickly chews on you";
             return "small ";
         } else if ((ratRNG >= 20) && (ratRNG < 25)) {
             // HP 3, ATK 3 == 6
             ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratAttackDescription = "squeeks and bites you";
             return "squeeking ";
         } else if ((ratRNG >= 25) && (ratRNG < 30)) {
             // HP 2, ATK 4 == 6
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratAttackDescription = "gnaws on you";
             return "hungry ";
         } else if ((ratRNG >= 30) && (ratRNG < 35)) {
             // HP 2, ATK 5 == 7
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratGold = 0;
+            ratAttackDescription = "spitefully chomps on you";
             return "homeless ";
         } else if ((ratRNG >= 35) && (ratRNG < 40)) {
             // HP 2, ATK 6 == 8
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratAttackDescription = "farts on your face";
             return "smelly ";
         } else if ((ratRNG >= 40) && (ratRNG < 45)) {
             // HP 5, ATK 3 == 8
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratAttackDescription = "skitters across you and gets hair all over you";
             return "hairy ";
         } else if ((ratRNG >= 45) && (ratRNG < 50)) {
             // HP 5, ATK 4 == 8
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratAttackDescription = "chomps on you";
             return "big ";
         } else if ((ratRNG >= 50) && (ratRNG < 55)) {
             // HP 4, ATK 5 == 9
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratGold = 4 + rng.nextInt(3) * ratsKilled / 7;
+            ratAttackDescription = "uses an orchestras magic on you";
             return "yellow ";
         } else if ((ratRNG >= 55) && (ratRNG < 60)) {
             // HP 3, ATK 6 == 9
             ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratAttackDescription = "flies on top of you and lands a bite on you";
             return "flying ";
         } else if ((ratRNG >= 60) && (ratRNG < 65)) {
             // HP 4, ATK 5 == 9
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "socks you";
             return "boxer ";
         } else if ((ratRNG >= 65) && (ratRNG < 70)) {
             // HP 4, ATK -4 == 0
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (-4 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (-4 * ratsKilled) / 3;
+            ratAttackDescription = "apologizes and offers you some syrup ";
             return "canadian ";
         } else if ((ratRNG >= 70) && (ratRNG < 75)) {
             // HP 5, ATK 5 == 10
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "vengfully bites you";
             return "lab ";
         } else if ((ratRNG >= 75) && (ratRNG < 80)) {
             // HP 1, ATK 9 == 10
             ratHP = rng.nextInt(10) + (1 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratAttackDescription = "shoots himself at you";
             return "cannon ";
         } else if ((ratRNG >= 80) && (ratRNG < 85)) {
             // HP 5, ATK 5 == 10
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "mech punches you";
             return "cyborg ";
         } else if ((ratRNG >= 85) && (ratRNG < 95)) {
             // HP 4, ATK 6 == 10
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratAttackDescription = "uses a damage algorythm on you";
             return "computer ";
         } else if ((ratRNG >= 90) && (ratRNG < 100)) {
-            // HP 6, ATK 4 == 10
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
-            return "robo ";
+            // HP 5, ATK 3 == 18
+            ratHP = rng.nextInt(10) + (5 * ratsKilled);
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratAttackDescription = "pecks you";
+            return "pigeon ";
         } else if ((ratRNG >= 95) && (ratRNG < 105)) {
             // HP 5, ATK 5 == 10
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "scratches you with five claws instead of four";
             return "five toe'd ";
         } else if ((ratRNG >= 100) && (ratRNG < 110)) {
             // HP 4, ATK 6 == 10
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratAttackDescription = "throws curry at your eyes";
             return "indian ";
         } else if ((ratRNG >= 105) && (ratRNG < 110)) {
             // HP 6, ATK 5 == 11
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "wraps you in seaweed";
             return "sushi ";
         } else if ((ratRNG >= 110) && (ratRNG < 115)) {
             // HP 3, ATK 8 == 11
             ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "reluctantly drowned you in syrup";
             return "canadian (mad) ";
         } else if ((ratRNG >= 115) && (ratRNG < 120)) {
             // HP 3, ATK 8 == 11
             ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "chops you";
             return "karate ";
         } else if ((ratRNG >= 120) && (ratRNG < 125)) {
             // HP 11, ATK 6 == 11 + (6/2)
             ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            //ratATK = rng.nextInt(2) * (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(2) * (6 * ratsKilled) / 3;
+            ratAttackDescription = "transforms into something wooden";
             return "wood ";
         } else if ((ratRNG >= 125) && (ratRNG < 130)) {
             // HP 5, ATK 7 == 12
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "run you over with his Toyota Camry";
             return "road ";
         } else if ((ratRNG >= 130) && (ratRNG < 135)) {
-            // HP 6, ATK 6 == 12
+            // HP 8, ATK 4 == 12
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratAttackDescription = "PUNK MOSH";
             return "mullet ";
         } else if ((ratRNG >= 135) && (ratRNG < 140)) {
             // HP 5, ATK 7 == 12
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "censors you";
             return "chinese ";
         } else if ((ratRNG >= 140) && (ratRNG < 145)) {
             // HP 2, ATK 10 == 12
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratAttackDescription = "breaks";
             return "glass ";
         } else if ((ratRNG >= 145) && (ratRNG < 150)) {
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratAttackDescription = "https://www.youtube.com/watch?v=UWINseIbbdQ";
             return "DK ";
         } else if ((ratRNG >= 150) && (ratRNG < 155)) {
             // HP ?, ATK ? == ?
             ratHP = rng.nextInt((19) - 6) * (2 * ratsKilled);
-            //ratATK = rng.nextInt((19) - 6) * (2 * ratsKilled);
+            // ratATK = rng.nextInt((19) - 6) * (2 * ratsKilled);
+            ratAttackDescription = "does something";
             return "random ";
         } else if ((ratRNG >= 155) && (ratRNG < 160)) {
             // HP 7, ATK 5 == 12
             ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "calls upon the kraken";
             return "ocean ";
         } else if ((ratRNG >= 160) && (ratRNG < 165)) {
             // HP 4, ATK 8 == 12
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "jumps in your mouth and sneezes";
             return "poison ";
         } else if ((ratRNG >= 165) && (ratRNG < 170)) {
             // HP 5, ATK 7 == 12
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "deadlifts you";
             return "gym ";
         } else if ((ratRNG >= 170) && (ratRNG < 175)) {
             // HP 10, ATK 2 == 12
             ratHP = rng.nextInt(10) + (10 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratAttackDescription = "rams into you";
             return "cross country ";
         } else if ((ratRNG >= 175) && (ratRNG < 180)) {
             // HP 8, ATK 4 == 12
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratAttackDescription = "freezes you";
             return "ice ";
         } else if ((ratRNG >= 180) && (ratRNG < 185)) {
             // HP 4, ATK 8 == 12
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "burns you";
             return "fire ";
         } else if ((ratRNG >= 185) && (ratRNG < 190)) {
             // HP 2, ATK 11 == 13
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            ratAttackDescription = "shoots a lazer gun at you";
             return "space ";
         } else if ((ratRNG >= 190) && (ratRNG < 195)) {
             // HP 2, ATK 1 == 3
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            ratAttackDescription = "screams \"EXcqeeze Me?!?!?!\"";
             return "xander ";
         } else if ((ratRNG >= 195) && (ratRNG < 200)) {
             // HP 6, ATK 7 == 13
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "slaps you";
             return "russian ";
         } else if ((ratRNG >= 200) && (ratRNG < 205)) {
             // HP 7, ATK 6 == 13
             ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratAttackDescription = "plays out of tune";
             return "music ";
         } else if ((ratRNG >= 205) && (ratRNG < 210)) {
             // HP 8, ATK 5 == 13
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "decks you in the jaw";
             return "iron ";
         } else if ((ratRNG >= 210) && (ratRNG < 215)) {
             // HP 5, ATK 8 == 13
             ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "PUNK MOSH";
             return "punk ";
         } else if ((ratRNG >= 215) && (ratRNG < 220)) {
             // HP 7, ATK 7 == 14
             ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "DIES IN FORTNITE AND DOUBLES IN VOLUME";
             return "screaming ";
         } else if ((ratRNG >= 220) && (ratRNG < 225)) {
             // HP 15, ATK -1 == 14
             ratHP = rng.nextInt(10) + (15 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (-1 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (-1 * ratsKilled) / 3;
+            ratAttackDescription = "lets you take a breather and sit on him";
             return "chair ";
         } else if ((ratRNG >= 225) && (ratRNG < 230)) {
             // HP 6, ATK 8 == 14
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "brutalizes you";
             return "officer ";
         } else if ((ratRNG >= 230) && (ratRNG < 235)) {
             // HP 4, ATK 10 == 14
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratAttackDescription = "squeeks and infects you";
             return "plauge ";
         } else if ((ratRNG >= 235) && (ratRNG < 240)) {
             // HP 12, ATK 2 == 14
             ratHP = rng.nextInt(10) + (12 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratAttackDescription = "fits on your face";
             return "fat ";
         } else if ((ratRNG >= 240) && (ratRNG < 245)) {
             // HP 7, ATK 7 == 14
             ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "exempts you";
             return "sir ";
         } else if ((ratRNG >= 245) && (ratRNG < 250)) {
             // HP 8, ATK 7 == 15
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratAttackDescription = "releases";
             return "bad ";
         } else if ((ratRNG >= 250) && (ratRNG < 255)) {
             // HP 6, ATK 9 == 15
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratGold = 5 + rng.nextInt(10) * ratsKilled / 7;
+            ratAttackDescription = "fires you";
             return "business ";
         } else if ((ratRNG >= 255) && (ratRNG < 260)) {
             // HP 6, ATK 9 == 15
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratAttackDescription = "assults you";
             return "man ";
         } else if ((ratRNG >= 260) && (ratRNG < 265)) {
             // HP 8, ATK 8 == 16
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "hyper fang";
             return "super ";
         } else if ((ratRNG >= 265) && (ratRNG < 270)) {
             // HP 8, ATK 8 == 16
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "throws garbage at you";
             return "philadelphia ";
         } else if ((ratRNG >= 270) && (ratRNG < 275)) {
             // HP 12, ATK 5 == 17
             ratHP = rng.nextInt(10) + (12 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratAttackDescription = "swallows";
             return "whale ";
         } else if ((ratRNG >= 275) && (ratRNG < 280)) {
             // HP 8, ATK 8 == 16
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "beheads";
             return "royal ";
         } else if ((ratRNG >= 280) && (ratRNG < 285)) {
             // HP 3, ATK 13 == 16
             ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (13 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (13 * ratsKilled) / 3;
+            ratAttackDescription = "mutates you";
             return "radioactive ";
         } else if ((ratRNG >= 285) && (ratRNG < 290)) {
             // HP 16, ATK 0 == 16
             ratHP = rng.nextInt(10) + (16 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            ratAttackDescription = "remains a statue";
             return "statue ";
         } else if ((ratRNG >= 290) && (ratRNG < 295)) {
             // HP -16, ATK 0 == -16
             ratHP = rng.nextInt(10) + (-16 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            ratAttackDescription = "rests in peace";
             return "dead ";
         } else if ((ratRNG >= 295) && (ratRNG < 300)) {
             // HP 6, ATK 10 == 16
             ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratAttackDescription = "tricks you";
             return "candy ";
         } else if ((ratRNG >= 300) && (ratRNG < 305)) {
             // HP 8, ATK 9 == 17
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratAttackDescription = "politely strikes you";
             return "regal ";
         } else if ((ratRNG >= 305) && (ratRNG < 310)) {
             // HP 2, ATK 15 == 17
             ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (17 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (17 * ratsKilled) / 3;
+            ratAttackDescription = "expodes";
             return "kamikaze ";
         } else if ((ratRNG >= 310) && (ratRNG < 315)) {
             // HP 9, ATK 8 == 17
             ratHP = rng.nextInt(10) + (9 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratAttackDescription = "eats garbage";
             return "Emeile ";
         } else if ((ratRNG >= 315) && (ratRNG < 320)) {
             // HP 9, ATK 9 == 18
             ratHP = rng.nextInt(10) + (9 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratAttackDescription = "solves the function";
             return "math ";
         } else if ((ratRNG >= 320) && (ratRNG < 325)) {
             // HP 8, ATK 11 == 19
             ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            ratAttackDescription = "rips you in half";
             return "gorilla ";
         } else if ((ratRNG >= 325) && (ratRNG < 330)) {
             // HP 10, ATK 10 == 20
             ratHP = rng.nextInt(10) + (10 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratAttackDescription = "cooks his famous ratatouille";
             return "Remy ";
         } else if ((ratRNG >= 330) && (ratRNG < 335)) {
             // HP 15, ATK 15 == 30
             ratHP = rng.nextInt(10) + (15 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (15 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (15 * ratsKilled) / 3;
+            ratAttackDescription = "exiles";
             return "Emporer ";
         } else if ((ratRNG >= 335) && (ratRNG < 340)) {
             // HP 200, ATK 20 == 220
             ratHP = rng.nextInt(10) + (200 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (20 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (20 * ratsKilled) / 3;
+            ratAttackDescription = "punishes you, an ignorant human, for attempting to defeat the rats";
             return "the last ";
         } else {// HP 3, ATK 2 == 5
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            //ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratAttackDescription = "bites you";
             return "";
         }
     }
@@ -1129,7 +1579,7 @@ public class RatSimulatorTwo {
         } else if ((ratRNG >= 85) && (ratRNG < 95)) {
             ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
         } else if ((ratRNG >= 90) && (ratRNG < 100)) {
-            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
         } else if ((ratRNG >= 95) && (ratRNG < 105)) {
             ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
         } else if ((ratRNG >= 100) && (ratRNG < 110)) {
@@ -1141,11 +1591,11 @@ public class RatSimulatorTwo {
         } else if ((ratRNG >= 115) && (ratRNG < 120)) {
             ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
         } else if ((ratRNG >= 120) && (ratRNG < 125)) {
-            ratATK = rng.nextInt(2) * (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(2) * (5 * ratsKilled) / 3;
         } else if ((ratRNG >= 125) && (ratRNG < 130)) {
             ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
         } else if ((ratRNG >= 130) && (ratRNG < 135)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
         } else if ((ratRNG >= 135) && (ratRNG < 140)) {
             ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
         } else if ((ratRNG >= 140) && (ratRNG < 145)) {
@@ -1153,7 +1603,7 @@ public class RatSimulatorTwo {
         } else if ((ratRNG >= 145) && (ratRNG < 150)) {
             ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
         } else if ((ratRNG >= 150) && (ratRNG < 155)) {
-            ratATK = rng.nextInt((11) - 6) * (2 * ratsKilled);
+            ratATK = rng.nextInt((10) - 6) * (2 * ratsKilled);
         } else if ((ratRNG >= 155) && (ratRNG < 160)) {
             ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
         } else if ((ratRNG >= 160) && (ratRNG < 165)) {
@@ -1271,7 +1721,7 @@ public class RatSimulatorTwo {
         } else if ((ratRNG >= 85) && (ratRNG < 95)) {
             return "computer ";
         } else if ((ratRNG >= 90) && (ratRNG < 100)) {
-            return "robo ";
+            return "pigeon ";
         } else if ((ratRNG >= 95) && (ratRNG < 105)) {
             return "five toe'd ";
         } else if ((ratRNG >= 100) && (ratRNG < 110)) {
@@ -1387,6 +1837,9 @@ public class RatSimulatorTwo {
                 attackRat();
                 break;
             case "Shoot":
+                attackRat();
+                break;
+            case "Stab":
                 attackRat();
                 break;
             case "Magic":
