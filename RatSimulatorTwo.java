@@ -18,17 +18,19 @@ public class RatSimulatorTwo {
 
     JFrame window;
     JTextArea mainTextArea;
-    JPanel mainTextPanel, attackButtonPanel, statsPanel, descriptionPanel;
+    JPanel mainTextPanel, attackButtonPanel, statsPanel, descriptionPanel, healPanel;
     JLabel statsLabel, descriptionLabel;
     Container con;
-    JButton attackButton, magicButton, healButton, backButton, shopButton, leaveButton, continueButton;
+    JButton attackButton, magicButton, healButton, lickButton, backButton, shopButton, leaveButton, continueButton;
     int playerATK, ratATK, ratGold, shopRNG;
+    boolean healTab = false;
+    boolean ownLick = false;
 
     // Battle data
     String playerWeapon = "Nothing";
     String playerWeaponVerbForButton = "Attack";
     String playerWeaponVerb = "attack";
-    String ratAttackDescription;
+    String ratAttackDescription = "bites you";
     boolean magicKill;
     int ratHP = 15;
     int playerHP = 100;
@@ -41,7 +43,9 @@ public class RatSimulatorTwo {
     int playerGold = 0;
 
     // Inventory data
-    JButton inventoryButton, usePotionButton, buyPotionButton, buyMushroomButton, useMushroomButton, buyTendyButton, useTendyButton, buyPencilButton, usePencilButton, usePistolButton, buyPistolButton, buyHatButton, useHatButton;
+    JButton inventoryButton, usePotionButton, buyPotionButton, buyMushroomButton, useMushroomButton, buyTendyButton,
+            useTendyButton, buyPencilButton, usePencilButton, usePistolButton, buyPistolButton, buyHatButton,
+            useHatButton;
     JPanel inventoryPanel, shopDescriptionPanel;
     JLabel shopDescriptionLabel;
     boolean inventoryOpen = false;
@@ -91,6 +95,13 @@ public class RatSimulatorTwo {
         inventoryPanel.setBounds(50, 460, 700, 80);
         inventoryPanel.setBackground(Color.black);
         con.add(inventoryPanel);
+        inventoryPanel.setVisible(false);
+
+        healPanel = new JPanel();
+        healPanel.setBounds(50, 460, 700, 80);
+        healPanel.setBackground(Color.black);
+        con.add(healPanel);
+        healPanel.setVisible(false);
 
         descriptionPanel = new JPanel();
         descriptionPanel.setBounds(0, 420, 800, 69);
@@ -188,31 +199,6 @@ public class RatSimulatorTwo {
         attackButtonPanel.add(healButton);
         healButton.setFocusPainted(false);
         healButton.addActionListener(choiceHandler);
-        healButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                if (playerMP < (2 + (Math.round(ratsKilled / 8)))) {
-                    descriptionLabel.setText("You don't have enough mana!  You need atleast "
-                            + (2 + (Math.round(ratsKilled / 8))) + " MP to cast Heal.");
-                } else {
-                    descriptionLabel.setText("( " + (turn + 25) + " - " + (turn + 25) + "  HP )\n\n  Requires : "
-                            + (2 + (Math.round(ratsKilled / 8))) + " MP");
-                }
-            }
-
-            public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                if (playerMP < (2 + (Math.round(ratsKilled / 8)))) {
-                    descriptionLabel.setText("You don't have enough mana!  You need atleast "
-                            + (2 + (Math.round(ratsKilled / 8))) + " MP to cast Heal.");
-                } else {
-                    descriptionLabel.setText("( " + (turn + 25) + " - " + (turn + 25) + "  HP )\n\n  Requires : "
-                            + (2 + (Math.round(ratsKilled / 8))) + " MP");
-                }
-            }
-
-            public void mouseExited(final java.awt.event.MouseEvent evt) {
-                descriptionLabel.setText("");
-            }
-        });
 
         shopButton = new JButton();
         shopButton.setBackground(Color.black);
@@ -288,10 +274,9 @@ public class RatSimulatorTwo {
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                if (potionCount > 0){
-                descriptionLabel.setText("A yellow rat-shaped potion you bought from a rat.");
-                }
-                else{
+                if (potionCount > 0) {
+                    descriptionLabel.setText("A yellow rat-shaped potion you bought from a rat.");
+                } else {
                     descriptionLabel.setText("You don't have any potions.");
                 }
             }
@@ -331,10 +316,9 @@ public class RatSimulatorTwo {
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                if (mushroomCount > 0){
-                descriptionLabel.setText("A slender mushroom that looks like it might kill you if you eat it.");
-                }
-                else{
+                if (mushroomCount > 0) {
+                    descriptionLabel.setText("A slender mushroom that looks like it might kill you if you eat it.");
+                } else {
                     descriptionLabel.setText("You don't have any mushrooms.");
                 }
             }
@@ -374,10 +358,9 @@ public class RatSimulatorTwo {
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                if (tendyCount > 0){
-                descriptionLabel.setText("A big juicy tendy with a nice crunch to it.");
-                }
-                else {
+                if (tendyCount > 0) {
+                    descriptionLabel.setText("A big juicy tendy with a nice crunch to it.");
+                } else {
                     descriptionLabel.setText("You don't have any tendies.");
                 }
             }
@@ -472,18 +455,18 @@ public class RatSimulatorTwo {
             }
         });
 
-        buyPistolButton = new JButton();
-        buyPistolButton.setBackground(Color.black);
-        buyPistolButton.setForeground(Color.white);
-        buyPistolButton.setText("Pistol");
-        buyPistolButton.setFocusPainted(false);
-        buyPistolButton.addMouseListener(new java.awt.event.MouseAdapter() {
+        buyHatButton = new JButton();
+        buyHatButton.setBackground(Color.black);
+        buyHatButton.setForeground(Color.white);
+        buyHatButton.setText("Hat");
+        buyHatButton.setFocusPainted(false);
+        buyHatButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                buyPistol();
+                buyHat();
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                shopDescriptionLabel.setText("A pistol with the engraving \"Polar Star\".");
+                shopDescriptionLabel.setText("A black Nike hat. Looks like good protection.");
             }
 
             public void mouseExited(final java.awt.event.MouseEvent evt) {
@@ -491,23 +474,19 @@ public class RatSimulatorTwo {
             }
         });
 
-        usePistolButton = new JButton();
-        usePistolButton.setBackground(Color.black);
-        usePistolButton.setForeground(Color.white);
-        usePistolButton.setText("Pistol");
-        usePistolButton.setFocusPainted(false);
-        usePistolButton.addMouseListener(new java.awt.event.MouseAdapter() {
+        useHatButton = new JButton();
+        useHatButton.setBackground(Color.black);
+        useHatButton.setForeground(Color.white);
+        useHatButton.setText("Hat");
+        useHatButton.setFocusPainted(false);
+        useHatButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                usePistol();
+                descriptionLabel.setText("(You're already wearing the hat.)");
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                if (playerWeapon == "Pistol") {
-                    descriptionLabel.setText(
-                            "(EQUIPPED) Upon further inspection, you notice another engraving \"Mrs. Wagner\".");
-                } else {
-                    descriptionLabel.setText("A pistol.");
-                }
+                descriptionLabel.setText(
+                        "You realize this is the legendary hat of Mr. Kim. May this hat protect you from any rat.");
             }
 
             public void mouseExited(final java.awt.event.MouseEvent evt) {
@@ -527,8 +506,6 @@ public class RatSimulatorTwo {
     // If attack button pressed, calculates and displays what happens
 
     public void attackRat() {
-
-        closeInventory();
 
         // If rat dead, encounter new rat
         if (ratHP <= 0) {
@@ -557,6 +534,9 @@ public class RatSimulatorTwo {
             // If rat isnt killed by attack, the rat then attacks. HP, MP, G, Turns are
             // updated. Battle message is displayed
             if (ratHP > 0) {
+                if (ownHat == true) {
+                    ratATK = (Math.round((ratATK * 8) / 10));
+                }
 
                 playerHP = playerHP - ratATK;
                 updateStats();
@@ -587,8 +567,6 @@ public class RatSimulatorTwo {
     // If magic button pressed, calculates and displays what happens
     public void magicAttackRat() {
 
-        closeInventory();
-
         // If rat dead, encounter new rat
         if (ratHP <= 0) {
             generateRat();
@@ -609,6 +587,9 @@ public class RatSimulatorTwo {
             // If rat isnt killed by attack, the rat then attacks. HP, MP, G, Turns are
             // updated. Battle message is displayed
             if (ratHP > 0) {
+                if (ownHat == true) {
+                    ratATK = (Math.round((ratATK * 8) / 10));
+                }
 
                 playerHP = playerHP - ratATK;
                 updateStats();
@@ -640,38 +621,84 @@ public class RatSimulatorTwo {
     // If magic button pressed, calculates and displays what happens
     public void heal() {
 
-        closeInventory();
+        if (healTab == false) {
 
-        // If rat dead, encounter new rat
+            openHealTab();
+        } else {
+
+            closeHealTab();
+        }
+
+        if (healTab == true) {
+            closeInventory();
+            // closeSpells
+        }
+    }
+
+    public void openHealTab() {
+        healTab = true;
+        healPanel.setVisible(true);
+
+        lickButton = new JButton("Lick Your Wounds");
+        lickButton.setBackground(Color.black);
+        lickButton.setForeground(Color.white);
+        lickButton.setFocusPainted(false);
+        lickButton.setVisible(true);
+        lickButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                if (playerMP >= 1){
+                lick();}
+                else{
+                    descriptionLabel.setText("You don't have enough mana!");
+                }
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("Lick your wounds and heal 40 - 50 HP (Requires 1 MP)");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        if (ownLick == false) {
+            ownLick = true;
+            healPanel.add(lickButton);
+        }
+    }
+
+    public void lick() {
+
         if (ratHP <= 0) {
             generateRat();
         }
 
-        // If rat alive, calculate rat ATK, how much player with heal
         else if (ratHP > 0) {
-
             generateRatATK();
-            int playerHPHealed = rng.nextInt(1) + turn + 25;
+            int playerHPHealed = rng.nextInt(11) + 40;
+            playerATK = 0;
 
-            // If player's HP is less than their max HP, add playerHPHealed + current
-            // playerHP
             if (playerHP < playerMaxHP) {
                 playerHP = playerHP + (Math.round(playerHPHealed));
             }
-
+            playerMP--;
             // Prevents heal from going past max HP
             while (playerHP > playerMaxHP) {
                 playerHP = playerMaxHP;
             }
+            while (playerMP > playerMaxMP) {
+                playerMP = playerMaxMP;
+            }
 
             // Subtract MP after cast, increase turn, subtract rat damage, update HP, MP, G,
             // Turn. Display battle message
-            playerMP = playerMP - (2 + (Math.round(ratsKilled / 8)));
+
             turn++;
             playerHP = playerHP - ratATK;
             updateStats();
-            mainTextArea.setText("\nYou heal yourself for " + playerHPHealed + " HP!\n\n\nThe " + ratNames() + "rat (# "
-                    + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe " + ratNames() + "rat "
+            mainTextArea.setText("\nYou lick your wounds and heal " + playerHPHealed + " HP!\n\n\nThe " + ratNames()
+                    + "rat (# " + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe " + ratNames() + "rat "
                     + ratAttackDescription + " for " + ratATK + " damage!");
         }
 
@@ -681,6 +708,11 @@ public class RatSimulatorTwo {
             die();
             break;
         }
+    }
+
+    public void closeHealTab() {
+        healTab = false;
+        healPanel.setVisible(false);
     }
 
     // Updates values of text in infoLabel
@@ -693,9 +725,13 @@ public class RatSimulatorTwo {
     }
 
     public void openInventory() {
+        if (healTab == true) {
+            closeHealTab();
+        }
         inventoryOpen = true;
         inventoryPanel.setVisible(true);
-        if ((potionCount == 0) && (mushroomCount == 0) && (tendyCount == 0) && (ownPencil == false) && (ownPistol == false)) {
+        if ((potionCount == 0) && (mushroomCount == 0) && (tendyCount == 0) && (ownPencil == false)
+                && (ownPistol == false) && (ownHat == false)) {
             descriptionLabel.setText("You have nothing in your inventory...");
         }
         if (potionCount != 0) {
@@ -722,6 +758,9 @@ public class RatSimulatorTwo {
         if (ownPistol == true) {
             usePistolButton.setVisible(true);
         }
+        if (ownHat == true) {
+            useHatButton.setVisible(true);
+        }
     }
 
     public void closeInventory() {
@@ -733,6 +772,8 @@ public class RatSimulatorTwo {
     // Message when player dies
     public void die() {
 
+        closeHealTab();
+        closeInventory();
         statsLabel.setText("You Have Fallen To The Rats");
         attackButtonPanel.setVisible(false);
         mainTextArea.setText("\nYou died.\n\n\nYou only manage to fend off a mere " + ratsKilled
@@ -744,8 +785,9 @@ public class RatSimulatorTwo {
 
         ratHP = 0;
         ratATK = 0;
-        playerMaxHP = (playerMaxHP + 15) + ratsKilled / 4;
-        playerHP = (playerHP + 15) + ratsKilled / 4;
+        playerMaxHP = (playerMaxHP + 10) + ratsKilled / 3;
+        playerHP = (playerHP + 10) + ratsKilled / 3;
+
         playerMaxMP = playerMaxMP + 1;
         playerMP = playerMP + 1;
         if (playerHP > playerMaxHP) {
@@ -762,9 +804,9 @@ public class RatSimulatorTwo {
     // Generates what rat will appear, display message
     public void generateRat() {
 
-        ratGold = 1 + (rng.nextInt(4) * ratsKilled / 6);
+        ratGold = 1 + (rng.nextInt(4) * ratsKilled / 5);
 
-        ratRNG = (3 * ratsKilled) + (rng.nextInt(31));
+        ratRNG = (4 * ratsKilled) + (rng.nextInt(31));
         mainTextArea.setText("\nA " + rats() + "rat appears with " + ratHP + " HP!\n\n\n\n\n\n\n\n\nWhat will you do?");
 
     }
@@ -785,21 +827,27 @@ public class RatSimulatorTwo {
         inventoryButton.setVisible(false);
         inventoryPanel.setVisible(false);
         inventoryOpen = false;
+        healTab = false;
+        healPanel.setVisible(false);
 
         potionCost = 5;
-        potionCost = rng.nextInt(4) + (potionCost + (ratsKilled / 15)) - 3;
+        potionCost = rng.nextInt(4) + potionCost - 3;
 
-        mushroomCost = 21;
-        mushroomCost = rng.nextInt(7) + (mushroomCost + (ratsKilled / 10)) - 6;
+        mushroomCost = 19;
+        mushroomCost = rng.nextInt(7) + mushroomCost - 6;
 
         tendyCost = 30;
-        tendyCost = rng.nextInt(3) + (tendyCost + (ratsKilled / 10)) - 2;;
+        tendyCost = rng.nextInt(6) + tendyCost - 2;
+        ;
 
         pencilCost = 20;
         pencilCost = rng.nextInt(10) + pencilCost - 5;
 
         pistolCost = 70;
         pistolCost = rng.nextInt(10) + pistolCost - 5;
+
+        hatCost = 120;
+        hatCost = rng.nextInt(30) + hatCost - 20;
 
     }
 
@@ -816,8 +864,11 @@ public class RatSimulatorTwo {
         descriptionPanel.add(buyTendyButton);
         descriptionPanel.add(buyPencilButton);
         descriptionPanel.add(buyPistolButton);
+        descriptionPanel.add(buyHatButton);
         buyPotionButton.setText("Potion - " + potionCost + "G");
         buyPotionButton.setVisible(true);
+        buyHatButton.setText("Nike Hat - " + hatCost + "G");
+        buyHatButton.setVisible(true);
 
         if (ownPencil == false) {
             buyPencilButton.setText("Pencil - " + pencilCost + "G");
@@ -825,14 +876,18 @@ public class RatSimulatorTwo {
             buyMushroomButton.setVisible(false);
             buyTendyButton.setVisible(false);
             buyPistolButton.setVisible(false);
+
         } else {
+
             buyPencilButton.setVisible(true);
         }
+
         if (ownPencil == true) {
             buyMushroomButton.setVisible(true);
             buyTendyButton.setVisible(true);
             buyPencilButton.setVisible(false);
             buyPistolButton.setVisible(true);
+            buyHatButton.setVisible(true);
             if (ownPistol == false) {
                 buyPistolButton.setText("Pistol - " + pistolCost + "G");
                 buyPistolButton.setVisible(true);
@@ -846,7 +901,11 @@ public class RatSimulatorTwo {
             buyTendyButton.setText("Tendy - " + tendyCost + "G");
             buyTendyButton.setVisible(false);
             buyPistolButton.setVisible(false);
-            
+        }
+        if (ownHat == true) {
+            buyHatButton.setVisible(false);
+        } else {
+            buyHatButton.setVisible(true);
         }
         shopButton.setVisible(false);
 
@@ -860,7 +919,8 @@ public class RatSimulatorTwo {
                 usePencilButton.setVisible(false);
                 playerGold = playerGold - pencilCost;
                 ownPencil = true;
-                mainTextArea.setText("\nSqueek Squeek Squeek.\n(Fine transaction, human.\n\n\n\n\n\nRemember to equip new weapons!");
+                mainTextArea.setText(
+                        "\nSqueek Squeek Squeek.\n(Fine transaction, human.\n\n\n\n\n\nRemember to equip new weapons!");
                 updateStats();
             } else {
                 mainTextArea.setText("\nSqueek Squeek.\n(All out of stock, human.)");
@@ -943,6 +1003,31 @@ public class RatSimulatorTwo {
             descriptionLabel.setText("A pistol.");
 
             usePencilButton.setText("Pencil");
+        }
+    }
+
+    public void buyHat() {
+
+        if (playerGold >= hatCost) {
+            if (ownHat == false) {
+                inventoryPanel.add(useHatButton);
+                useHatButton.setVisible(false);
+                playerGold = playerGold - hatCost;
+                ownHat = true;
+                mainTextArea.setText(
+                        "\nSqueek Squeek Squeek Squeek Squeek.\n(A masterfully forged cap, blessed by the gods. Enjoy the transaction, human.)");
+                updateStats();
+            } else {
+                mainTextArea.setText("\nSqueek Squeek.\n(There is but one cap, human.)");
+            }
+        } else if (playerGold == 0) {
+            mainTextArea.setText(
+                    "\nSqueek Squeek Squeek Squeek.\n(How the fuck do you not have a single piece of gold, you worthless fucking shit.)");
+        } else if (playerGold < pistolCost) {
+            mainTextArea.setText("\nSqueek.\nPoor human. Pitiful.");
+
+        } else {
+            leaveShop();
         }
     }
 
@@ -1058,8 +1143,7 @@ public class RatSimulatorTwo {
             }
             useTendyButton.setText("Tendy (x " + tendyCount + ")");
             updateStats();
-            descriptionLabel.setText(
-                    "\nYou eat the crispy, crunchy, juicy tendy. You restore 500 HP!");
+            descriptionLabel.setText("\nYou eat the crispy, crunchy, juicy tendy. You restore 500 HP!");
         } else {
             descriptionLabel.setText("You don't have any tendies");
         }
@@ -1082,6 +1166,7 @@ public class RatSimulatorTwo {
         buyTendyButton.setVisible(false);
         buyPencilButton.setVisible(false);
         buyPistolButton.setVisible(false);
+        buyHatButton.setVisible(false);
         shopRNG = 1;
 
     }
@@ -1110,8 +1195,9 @@ public class RatSimulatorTwo {
         healButton.setVisible(false);
         inventoryButton.setVisible(false);
         continueButton.setVisible(true);
+        closeHealTab();
 
-        shopRNG = rng.nextInt(4);
+        shopRNG = rng.nextInt(3);
 
     }
 
@@ -1132,411 +1218,411 @@ public class RatSimulatorTwo {
     public String rats() {
         if ((ratRNG >= 5) && (ratRNG < 10)) {
             // HP 1, ATK 1 == 2
-            ratHP = rng.nextInt(10) + (1 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (1 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (1 * ratsKilled) / 4;
             ratAttackDescription = "nips you";
             return "baby ";
         } else if ((ratRNG >= 10) && (ratRNG < 15)) {
             // HP 2, ATK 2 == 4
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 4;
             ratAttackDescription = "lightly bites you";
             return "weak ";
         } else if ((ratRNG >= 15) && (ratRNG < 20)) {
             // HP 2, ATK 3 == 5
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
             ratAttackDescription = "quickly chews on you";
             return "small ";
         } else if ((ratRNG >= 20) && (ratRNG < 25)) {
             // HP 3, ATK 3 == 6
-            ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (3 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
             ratAttackDescription = "squeeks and bites you";
             return "squeeking ";
         } else if ((ratRNG >= 25) && (ratRNG < 30)) {
             // HP 2, ATK 4 == 6
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 4;
             ratAttackDescription = "gnaws on you";
             return "hungry ";
         } else if ((ratRNG >= 30) && (ratRNG < 35)) {
             // HP 2, ATK 5 == 7
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratGold = 0;
             ratAttackDescription = "spitefully chomps on you";
             return "homeless ";
         } else if ((ratRNG >= 35) && (ratRNG < 40)) {
             // HP 2, ATK 6 == 8
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
             ratAttackDescription = "farts on your face";
             return "smelly ";
         } else if ((ratRNG >= 40) && (ratRNG < 45)) {
             // HP 5, ATK 3 == 8
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
             ratAttackDescription = "skitters across you and gets hair all over you";
             return "hairy ";
         } else if ((ratRNG >= 45) && (ratRNG < 50)) {
             // HP 5, ATK 4 == 8
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 4;
             ratAttackDescription = "chomps on you";
             return "big ";
         } else if ((ratRNG >= 50) && (ratRNG < 55)) {
             // HP 4, ATK 5 == 9
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
-            ratGold = 4 + rng.nextInt(3) * ratsKilled / 7;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
+            ratGold = 4 + rng.nextInt(3) * ratsKilled / 2;
             ratAttackDescription = "uses an orchestras magic on you";
             return "yellow ";
         } else if ((ratRNG >= 55) && (ratRNG < 60)) {
             // HP 3, ATK 6 == 9
-            ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (3 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
             ratAttackDescription = "flies on top of you and lands a bite on you";
             return "flying ";
         } else if ((ratRNG >= 60) && (ratRNG < 65)) {
             // HP 4, ATK 5 == 9
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "socks you";
             return "boxer ";
         } else if ((ratRNG >= 65) && (ratRNG < 70)) {
             // HP 4, ATK -4 == 0
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (-4 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (-4 * ratsKilled) / 4;
             ratAttackDescription = "apologizes and offers you some syrup ";
             return "canadian ";
         } else if ((ratRNG >= 70) && (ratRNG < 75)) {
             // HP 5, ATK 5 == 10
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "vengfully bites you";
             return "lab ";
         } else if ((ratRNG >= 75) && (ratRNG < 80)) {
             // HP 1, ATK 9 == 10
-            ratHP = rng.nextInt(10) + (1 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (1 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 4;
             ratAttackDescription = "shoots himself at you";
             return "cannon ";
         } else if ((ratRNG >= 80) && (ratRNG < 85)) {
             // HP 5, ATK 5 == 10
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "mech punches you";
             return "cyborg ";
         } else if ((ratRNG >= 85) && (ratRNG < 95)) {
             // HP 4, ATK 6 == 10
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
             ratAttackDescription = "uses a damage algorythm on you";
             return "computer ";
         } else if ((ratRNG >= 90) && (ratRNG < 100)) {
             // HP 5, ATK 3 == 18
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
             ratAttackDescription = "pecks you";
             return "pigeon ";
         } else if ((ratRNG >= 95) && (ratRNG < 105)) {
             // HP 5, ATK 5 == 10
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "scratches you with five claws instead of four";
             return "five toe'd ";
         } else if ((ratRNG >= 100) && (ratRNG < 110)) {
             // HP 4, ATK 6 == 10
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
             ratAttackDescription = "throws curry at your eyes";
             return "indian ";
         } else if ((ratRNG >= 105) && (ratRNG < 110)) {
             // HP 6, ATK 5 == 11
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "wraps you in seaweed";
             return "sushi ";
         } else if ((ratRNG >= 110) && (ratRNG < 115)) {
             // HP 3, ATK 8 == 11
-            ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (3 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "reluctantly drowned you in syrup";
             return "canadian (mad) ";
         } else if ((ratRNG >= 115) && (ratRNG < 120)) {
             // HP 3, ATK 8 == 11
-            ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (3 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "chops you";
             return "karate ";
         } else if ((ratRNG >= 120) && (ratRNG < 125)) {
             // HP 11, ATK 6 == 11 + (6/2)
-            ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            // ratATK = rng.nextInt(2) * (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (3 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(2) * (6 * ratsKilled) / 4;
             ratAttackDescription = "transforms into something wooden";
             return "wood ";
         } else if ((ratRNG >= 125) && (ratRNG < 130)) {
             // HP 5, ATK 7 == 12
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "run you over with his Toyota Camry";
             return "road ";
         } else if ((ratRNG >= 130) && (ratRNG < 135)) {
             // HP 8, ATK 4 == 12
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 4;
             ratAttackDescription = "PUNK MOSH";
             return "mullet ";
         } else if ((ratRNG >= 135) && (ratRNG < 140)) {
             // HP 5, ATK 7 == 12
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "censors you";
             return "chinese ";
         } else if ((ratRNG >= 140) && (ratRNG < 145)) {
             // HP 2, ATK 10 == 12
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 4;
             ratAttackDescription = "breaks";
             return "glass ";
         } else if ((ratRNG >= 145) && (ratRNG < 150)) {
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
             ratAttackDescription = "https://www.youtube.com/watch?v=UWINseIbbdQ";
             return "DK ";
         } else if ((ratRNG >= 150) && (ratRNG < 155)) {
             // HP ?, ATK ? == ?
-            ratHP = rng.nextInt((19) - 6) * (2 * ratsKilled);
-            // ratATK = rng.nextInt((19) - 6) * (2 * ratsKilled);
+            ratHP = rng.nextInt((19) - 6) * (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt((19) - 6) * (2 * ratsKilled) * 1;
             ratAttackDescription = "does something";
             return "random ";
         } else if ((ratRNG >= 155) && (ratRNG < 160)) {
             // HP 7, ATK 5 == 12
-            ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (7 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "calls upon the kraken";
             return "ocean ";
         } else if ((ratRNG >= 160) && (ratRNG < 165)) {
             // HP 4, ATK 8 == 12
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "jumps in your mouth and sneezes";
             return "poison ";
         } else if ((ratRNG >= 165) && (ratRNG < 170)) {
             // HP 5, ATK 7 == 12
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "deadlifts you";
             return "gym ";
         } else if ((ratRNG >= 170) && (ratRNG < 175)) {
             // HP 10, ATK 2 == 12
-            ratHP = rng.nextInt(10) + (10 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (10 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 4;
             ratAttackDescription = "rams into you";
             return "cross country ";
         } else if ((ratRNG >= 175) && (ratRNG < 180)) {
             // HP 8, ATK 4 == 12
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (4 * ratsKilled) / 4;
             ratAttackDescription = "freezes you";
             return "ice ";
         } else if ((ratRNG >= 180) && (ratRNG < 185)) {
             // HP 4, ATK 8 == 12
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "burns you";
             return "fire ";
         } else if ((ratRNG >= 185) && (ratRNG < 190)) {
             // HP 2, ATK 11 == 13
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (11 * ratsKilled) / 4;
             ratAttackDescription = "shoots a lazer gun at you";
             return "space ";
         } else if ((ratRNG >= 190) && (ratRNG < 195)) {
             // HP 2, ATK 1 == 3
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (1 * ratsKilled) / 4;
             ratAttackDescription = "screams \"EXcqeeze Me?!?!?!\"";
             return "xander ";
         } else if ((ratRNG >= 195) && (ratRNG < 200)) {
             // HP 6, ATK 7 == 13
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "slaps you";
             return "russian ";
         } else if ((ratRNG >= 200) && (ratRNG < 205)) {
             // HP 7, ATK 6 == 13
-            ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (7 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
             ratAttackDescription = "plays out of tune";
             return "music ";
         } else if ((ratRNG >= 205) && (ratRNG < 210)) {
             // HP 8, ATK 5 == 13
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "decks you in the jaw";
             return "iron ";
         } else if ((ratRNG >= 210) && (ratRNG < 215)) {
             // HP 5, ATK 8 == 13
-            ratHP = rng.nextInt(10) + (5 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (5 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "PUNK MOSH";
             return "punk ";
         } else if ((ratRNG >= 215) && (ratRNG < 220)) {
             // HP 7, ATK 7 == 14
-            ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (7 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "DIES IN FORTNITE AND DOUBLES IN VOLUME";
             return "screaming ";
         } else if ((ratRNG >= 220) && (ratRNG < 225)) {
             // HP 15, ATK -1 == 14
-            ratHP = rng.nextInt(10) + (15 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (-1 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (15 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (-1 * ratsKilled) / 4;
             ratAttackDescription = "lets you take a breather and sit on him";
             return "chair ";
         } else if ((ratRNG >= 225) && (ratRNG < 230)) {
             // HP 6, ATK 8 == 14
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "brutalizes you";
             return "officer ";
         } else if ((ratRNG >= 230) && (ratRNG < 235)) {
             // HP 4, ATK 10 == 14
-            ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 4;
             ratAttackDescription = "squeeks and infects you";
             return "plauge ";
         } else if ((ratRNG >= 235) && (ratRNG < 240)) {
             // HP 12, ATK 2 == 14
-            ratHP = rng.nextInt(10) + (12 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (12 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (2 * ratsKilled) / 4;
             ratAttackDescription = "fits on your face";
             return "fat ";
         } else if ((ratRNG >= 240) && (ratRNG < 245)) {
             // HP 7, ATK 7 == 14
-            ratHP = rng.nextInt(10) + (7 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (7 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "exempts you";
             return "sir ";
         } else if ((ratRNG >= 245) && (ratRNG < 250)) {
             // HP 8, ATK 7 == 15
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (7 * ratsKilled) / 4;
             ratAttackDescription = "releases";
             return "bad ";
         } else if ((ratRNG >= 250) && (ratRNG < 255)) {
             // HP 6, ATK 9 == 15
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 4;
             ratGold = 5 + rng.nextInt(10) * ratsKilled / 7;
             ratAttackDescription = "fires you";
             return "business ";
         } else if ((ratRNG >= 255) && (ratRNG < 260)) {
             // HP 6, ATK 9 == 15
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 4;
             ratAttackDescription = "assults you";
             return "man ";
         } else if ((ratRNG >= 260) && (ratRNG < 265)) {
             // HP 8, ATK 8 == 16
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
-            ratAttackDescription = "hyper fang";
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
+            ratAttackDescription = "uses hyper fang";
             return "super ";
         } else if ((ratRNG >= 265) && (ratRNG < 270)) {
             // HP 8, ATK 8 == 16
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "throws garbage at you";
             return "philadelphia ";
         } else if ((ratRNG >= 270) && (ratRNG < 275)) {
             // HP 12, ATK 5 == 17
-            ratHP = rng.nextInt(10) + (12 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (12 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratAttackDescription = "swallows";
             return "whale ";
         } else if ((ratRNG >= 275) && (ratRNG < 280)) {
             // HP 8, ATK 8 == 16
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "beheads";
             return "royal ";
         } else if ((ratRNG >= 280) && (ratRNG < 285)) {
             // HP 3, ATK 13 == 16
-            ratHP = rng.nextInt(10) + (3 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (13 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (3 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (13 * ratsKilled) / 4;
             ratAttackDescription = "mutates you";
             return "radioactive ";
         } else if ((ratRNG >= 285) && (ratRNG < 290)) {
             // HP 16, ATK 0 == 16
-            ratHP = rng.nextInt(10) + (16 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (16 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (0 * ratsKilled) / 4;
             ratAttackDescription = "remains a statue";
             return "statue ";
         } else if ((ratRNG >= 290) && (ratRNG < 295)) {
             // HP -16, ATK 0 == -16
-            ratHP = rng.nextInt(10) + (-16 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (-16 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (0 * ratsKilled) / 4;
             ratAttackDescription = "rests in peace";
             return "dead ";
         } else if ((ratRNG >= 295) && (ratRNG < 300)) {
             // HP 6, ATK 10 == 16
-            ratHP = rng.nextInt(10) + (6 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (6 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 4;
             ratAttackDescription = "tricks you";
             return "candy ";
         } else if ((ratRNG >= 300) && (ratRNG < 305)) {
             // HP 8, ATK 9 == 17
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 4;
             ratAttackDescription = "politely strikes you";
             return "regal ";
         } else if ((ratRNG >= 305) && (ratRNG < 310)) {
             // HP 2, ATK 15 == 17
-            ratHP = rng.nextInt(10) + (2 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (17 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (2 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (17 * ratsKilled) / 4;
             ratAttackDescription = "expodes";
             return "kamikaze ";
         } else if ((ratRNG >= 310) && (ratRNG < 315)) {
             // HP 9, ATK 8 == 17
-            ratHP = rng.nextInt(10) + (9 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (9 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (8 * ratsKilled) / 4;
             ratAttackDescription = "eats garbage";
             return "Emeile ";
         } else if ((ratRNG >= 315) && (ratRNG < 320)) {
             // HP 9, ATK 9 == 18
-            ratHP = rng.nextInt(10) + (9 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (9 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (9 * ratsKilled) / 4;
             ratAttackDescription = "solves the function";
             return "math ";
         } else if ((ratRNG >= 320) && (ratRNG < 325)) {
             // HP 8, ATK 11 == 19
-            ratHP = rng.nextInt(10) + (8 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (8 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (11 * ratsKilled) / 4;
             ratAttackDescription = "rips you in half";
             return "gorilla ";
         } else if ((ratRNG >= 325) && (ratRNG < 330)) {
             // HP 10, ATK 10 == 20
-            ratHP = rng.nextInt(10) + (10 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (10 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (10 * ratsKilled) / 4;
             ratAttackDescription = "cooks his famous ratatouille";
             return "Remy ";
         } else if ((ratRNG >= 330) && (ratRNG < 335)) {
             // HP 15, ATK 15 == 30
-            ratHP = rng.nextInt(10) + (15 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (15 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (15 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (15 * ratsKilled) / 4;
             ratAttackDescription = "exiles";
             return "Emporer ";
-        } else if ((ratRNG >= 335) && (ratRNG < 340)) {
+        } else if ((ratRNG >= 335) && (ratRNG < 999)) {
             // HP 200, ATK 20 == 220
-            ratHP = rng.nextInt(10) + (200 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (20 * ratsKilled) / 3;
+            ratHP = rng.nextInt(10) + (200 * ratsKilled) * 1;
+            // ratATK = rng.nextInt(10) + (20 * ratsKilled) / 4;
             ratAttackDescription = "punishes you, an ignorant human, for attempting to defeat the rats";
             return "the last ";
         } else {// HP 3, ATK 2 == 5
             ratHP = rng.nextInt(10) + (4 * ratsKilled);
-            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            // ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
             ratAttackDescription = "bites you";
             return "";
         }
@@ -1545,141 +1631,141 @@ public class RatSimulatorTwo {
     // Used every turn in combat to randomly generate the rat's ATK
     public void generateRatATK() {
         if ((ratRNG >= 5) && (ratRNG < 10)) {
-            ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (1 * ratsKilled) / 4;
         } else if ((ratRNG >= 10) && (ratRNG < 15)) {
-            ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (2 * ratsKilled) / 4;
         } else if ((ratRNG >= 15) && (ratRNG < 20)) {
-            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
         } else if ((ratRNG >= 20) && (ratRNG < 25)) {
-            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
         } else if ((ratRNG >= 25) && (ratRNG < 30)) {
-            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 4;
         } else if ((ratRNG >= 30) && (ratRNG < 35)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
         } else if ((ratRNG >= 35) && (ratRNG < 40)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
         } else if ((ratRNG >= 40) && (ratRNG < 45)) {
-            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
         } else if ((ratRNG >= 45) && (ratRNG < 50)) {
-            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 4;
         } else if ((ratRNG >= 50) && (ratRNG < 55)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
         } else if ((ratRNG >= 55) && (ratRNG < 60)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
         } else if ((ratRNG >= 60) && (ratRNG < 65)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
         } else if ((ratRNG >= 65) && (ratRNG < 70)) {
-            ratATK = rng.nextInt(10) + (-4 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (-4 * ratsKilled) / 4;
         } else if ((ratRNG >= 70) && (ratRNG < 75)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
         } else if ((ratRNG >= 75) && (ratRNG < 80)) {
-            ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (9 * ratsKilled) / 4;
         } else if ((ratRNG >= 80) && (ratRNG < 85)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
         } else if ((ratRNG >= 85) && (ratRNG < 95)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 4;
         } else if ((ratRNG >= 90) && (ratRNG < 100)) {
-            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
         } else if ((ratRNG >= 95) && (ratRNG < 105)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
         } else if ((ratRNG >= 100) && (ratRNG < 110)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (6 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 105) && (ratRNG < 110)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (5 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 110) && (ratRNG < 115)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (8 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 115) && (ratRNG < 120)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (8 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 120) && (ratRNG < 125)) {
-            ratATK = rng.nextInt(2) * (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(2) * (5 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 125) && (ratRNG < 130)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (7 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 130) && (ratRNG < 135)) {
-            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (4 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 135) && (ratRNG < 140)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(15) + (7 * (ratsKilled) - 10) / 3;
         } else if ((ratRNG >= 140) && (ratRNG < 145)) {
-            ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (10 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 145) && (ratRNG < 150)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (6 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 150) && (ratRNG < 155)) {
             ratATK = rng.nextInt((10) - 6) * (2 * ratsKilled);
         } else if ((ratRNG >= 155) && (ratRNG < 160)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (5 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 160) && (ratRNG < 165)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (8 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 165) && (ratRNG < 170)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (7 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 170) && (ratRNG < 175)) {
-            ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (2 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 175) && (ratRNG < 180)) {
-            ratATK = rng.nextInt(10) + (4 * ratsKilled) / 3;
+            ratATK = rng.nextInt(20) + (4 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 180) && (ratRNG < 185)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (8 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 185) && (ratRNG < 190)) {
-            ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (11 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 190) && (ratRNG < 195)) {
-            ratATK = rng.nextInt(10) + (1 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (1 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 195) && (ratRNG < 200)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (7 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 200) && (ratRNG < 205)) {
-            ratATK = rng.nextInt(10) + (6 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (6 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 205) && (ratRNG < 210)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (5 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 210) && (ratRNG < 215)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (8 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 215) && (ratRNG < 220)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (7 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 220) && (ratRNG < 225)) {
-            ratATK = rng.nextInt(10) + (-1 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (-1 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 225) && (ratRNG < 230)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(25) + (8 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 230) && (ratRNG < 235)) {
-            ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (10 * (ratsKilled) - 15) / 3;
         } else if ((ratRNG >= 235) && (ratRNG < 240)) {
-            ratATK = rng.nextInt(10) + (2 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (2 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 240) && (ratRNG < 245)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (7 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 245) && (ratRNG < 250)) {
-            ratATK = rng.nextInt(10) + (7 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (7 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 250) && (ratRNG < 255)) {
-            ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (9 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 255) && (ratRNG < 260)) {
-            ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (9 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 260) && (ratRNG < 265)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (8 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 265) && (ratRNG < 270)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (8 * (ratsKilled) - 20) / 3;
         } else if ((ratRNG >= 270) && (ratRNG < 275)) {
-            ratATK = rng.nextInt(10) + (5 * ratsKilled) / 3;
+            ratATK = rng.nextInt(30) + (5 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 275) && (ratRNG < 280)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (8 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 280) && (ratRNG < 285)) {
-            ratATK = rng.nextInt(10) + (13 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (13 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 285) && (ratRNG < 290)) {
-            ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            ratATK = rng.nextInt(1) + (0 * (ratsKilled)) / 3;
         } else if ((ratRNG >= 290) && (ratRNG < 295)) {
-            ratATK = rng.nextInt(10) + (0 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (0 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 295) && (ratRNG < 300)) {
-            ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (10 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 300) && (ratRNG < 305)) {
-            ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (9 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 305) && (ratRNG < 310)) {
-            ratATK = rng.nextInt(10) + (17 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (17 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 310) && (ratRNG < 315)) {
-            ratATK = rng.nextInt(10) + (8 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (8 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 315) && (ratRNG < 320)) {
-            ratATK = rng.nextInt(10) + (9 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (9 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 320) && (ratRNG < 325)) {
-            ratATK = rng.nextInt(10) + (11 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (11 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 325) && (ratRNG < 330)) {
-            ratATK = rng.nextInt(10) + (10 * ratsKilled) / 3;
+            ratATK = rng.nextInt(35) + (10 * (ratsKilled) - 25) / 3;
         } else if ((ratRNG >= 330) && (ratRNG < 335)) {
-            ratATK = rng.nextInt(10) + (15 * ratsKilled) / 3;
-        } else if ((ratRNG >= 335) && (ratRNG < 340)) {
-            ratATK = rng.nextInt(10) + (20 * ratsKilled) / 3;
+            ratATK = rng.nextInt(50) + (15 * ratsKilled) / 4;
+        } else if ((ratRNG >= 335) && (ratRNG < 999)) {
+            ratATK = rng.nextInt(420) + (10 * ratsKilled);
         } else {
-            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 3;
+            ratATK = rng.nextInt(10) + (3 * ratsKilled) / 4;
         }
     }
 
@@ -1818,7 +1904,7 @@ public class RatSimulatorTwo {
             return "Remy ";
         } else if ((ratRNG >= 330) && (ratRNG < 335)) {
             return "Emporer ";
-        } else if ((ratRNG >= 335) && (ratRNG < 340)) {
+        } else if ((ratRNG >= 335) && (ratRNG < 999)) {
             return "the last ";
         } else {
             return "";
@@ -1850,12 +1936,8 @@ public class RatSimulatorTwo {
                     break;
                 }
             case "Heal":
-                if (playerMP >= (2 + (Math.round(ratsKilled / 8)))) {
-                    heal();
-                    break;
-                } else {
-                    break;
-                }
+                heal();
+                break;
             case "Inventory": {
                 if (inventoryOpen == false) {
                     openInventory();
