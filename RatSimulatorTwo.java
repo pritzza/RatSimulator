@@ -18,27 +18,29 @@ public class RatSimulatorTwo {
 
     JFrame window;
     JTextArea mainTextArea;
-    JPanel mainTextPanel, attackButtonPanel, statsPanel, descriptionPanel, healPanel;
+    JPanel mainTextPanel, attackButtonPanel, statsPanel, descriptionPanel, spellPanel, healPanel;
     JLabel statsLabel, descriptionLabel;
     Container con;
-    JButton attackButton, magicButton, healButton, lickButton, backButton, shopButton, leaveButton, continueButton;
+    JButton attackButton, spellButton, shabuButton, shabu2Button, healButton, lickButton, lick2Button, lick3Button,
+            backButton, shopButton, leaveButton, continueButton;
     int playerATK, ratATK, ratGold, shopRNG;
-    boolean healTab = false;
-    boolean ownLick = false;
+    boolean healTab, ownLick, ownLick2, ownLick3 = false;
+    boolean spellTab, ownShabu, ownShabu2 = false;
 
     // Battle data
     String playerWeapon = "Nothing";
     String playerWeaponVerbForButton = "Attack";
     String playerWeaponVerb = "attack";
     String ratAttackDescription = "bites you";
-    boolean magicKill;
+    String spellKill;
     int ratHP = 15;
     int playerHP = 100;
     int playerMaxHP = 100;
     int playerMP = 10;
     int playerMaxMP = 10;
-    int ratsKilled = 1;
+    int ratsKilled = 51;
     int turn = 1;
+    int playerHPHealed;
     int ratRNG = 0;
     int playerGold = 0;
 
@@ -103,6 +105,12 @@ public class RatSimulatorTwo {
         con.add(healPanel);
         healPanel.setVisible(false);
 
+        spellPanel = new JPanel();
+        spellPanel.setBounds(50, 460, 700, 80);
+        spellPanel.setBackground(Color.black);
+        con.add(spellPanel);
+        spellPanel.setVisible(false);
+
         descriptionPanel = new JPanel();
         descriptionPanel.setBounds(0, 420, 800, 69);
         descriptionPanel.setBackground(Color.black);
@@ -166,33 +174,13 @@ public class RatSimulatorTwo {
             }
         });
 
-        magicButton = new JButton("Magic");
-        magicButton.setBackground(Color.black);
-        magicButton.setForeground(Color.white);
-        attackButtonPanel.add(magicButton);
-        magicButton.setFocusPainted(false);
-        magicButton.addActionListener(choiceHandler);
-        magicButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                if (playerMP < 3) {
-                    descriptionLabel.setText("You don't have enough mana!  You need atlesat 4 MP to cast Magic");
-                } else {
-                    descriptionLabel.setText("( " + turn / 2 + " - " + turn / 2 + "  damage )  Requires: 4 MP");
-                }
-            }
+        spellButton = new JButton("Spells");
+        spellButton.setBackground(Color.black);
+        spellButton.setForeground(Color.white);
+        attackButtonPanel.add(spellButton);
+        spellButton.setFocusPainted(false);
+        spellButton.addActionListener(choiceHandler);
 
-            public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                if (playerMP < 3) {
-                    descriptionLabel.setText("You don't have enough mana!  You need atlesat 4 MP to cast Magic");
-                } else {
-                    descriptionLabel.setText("( " + turn / 2 + " - " + turn / 2 + "  damage )  Requires: 4 MP");
-                }
-            }
-
-            public void mouseExited(final java.awt.event.MouseEvent evt) {
-                descriptionLabel.setText("");
-            }
-        });
         healButton = new JButton("Heal");
         healButton.setBackground(Color.black);
         healButton.setForeground(Color.white);
@@ -477,7 +465,7 @@ public class RatSimulatorTwo {
         useHatButton = new JButton();
         useHatButton.setBackground(Color.black);
         useHatButton.setForeground(Color.white);
-        useHatButton.setText("Hat");
+        useHatButton.setText("James' Hat");
         useHatButton.setFocusPainted(false);
         useHatButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(final java.awt.event.MouseEvent evt) {
@@ -550,7 +538,7 @@ public class RatSimulatorTwo {
             // Else if Rat is killed by players attack, increase player's max stats, update
             // HP, MP, G, turn values, and display rat killed message
             else {
-                magicKill = false;
+                spellKill = "";
                 ratKilled();
                 updateStats();
             }
@@ -559,33 +547,113 @@ public class RatSimulatorTwo {
         // If rat isnt killed by player attack, and player's HP goes below 0 after
         // exchanging damage, player dies. Displays death screen message
         while (playerHP <= 0) {
+
             die();
             break;
         }
     }
 
-    // If magic button pressed, calculates and displays what happens
-    public void magicAttackRat() {
+    public void spell() {
+
+        if (spellTab == false) {
+
+            openSpellTab();
+        } else {
+
+            closeSpellTab();
+        }
+
+        if (spellTab == true) {
+            closeInventory();
+            closeHealTab();
+            // closeSpells
+        }
+    }
+
+    public void openSpellTab() {
+        spellTab = true;
+        spellPanel.setVisible(true);
+
+        shabuButton = new JButton("Shabu");
+        shabuButton.setBackground(Color.black);
+        shabuButton.setForeground(Color.white);
+        shabuButton.setFocusPainted(false);
+        shabuButton.setVisible(true);
+        shabuButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                if (playerMP >= 3) {
+                    shabu();
+                } else {
+                    descriptionLabel.setText("You don't have enough mana!");
+                }
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("Scorch the enemy rat for 30 - 70 damage  (Requires 3 MP)");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        if (ownShabu == false) {
+            ownShabu = true;
+            spellPanel.add(shabuButton);
+        }
+
+        shabu2Button = new JButton("Shabu Shabu");
+        shabu2Button.setBackground(Color.black);
+        shabu2Button.setForeground(Color.white);
+        shabu2Button.setFocusPainted(false);
+        shabu2Button.setVisible(true);
+        shabu2Button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                if (playerMP >= 6) {
+                    shabu2();
+                } else {
+                    descriptionLabel.setText("You don't have enough mana!");
+                }
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText(
+                        "Scorch and eat the enemy rat; deal 120 - 170 damage and restore 70 - 80 HP (Requires 6 MP)");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        while ((ratsKilled >= 15) && (ownShabu2 == false)) {
+            ownShabu2 = true;
+            spellPanel.add(shabu2Button);
+        }
+    }
+
+    public void closeSpellTab() {
+        spellTab = false;
+        spellPanel.setVisible(false);
+    }
+
+    public void shabu() {
 
         // If rat dead, encounter new rat
         if (ratHP <= 0) {
             generateRat();
         }
 
-        // After checking if player has enough mana to cast magic attack and rat is
-        // alive, generate playerATK and ratATK, subtract 4 MP, increase turn, and
-        // exchange damage
+        // If rat alive, generate playerATK and ratATK and exchange damage
         else if (ratHP > 0) {
-
             generateRatATK();
-            playerATK = rng.nextInt(1) + turn / 2;
+            playerATK = rng.nextInt(41) + 30;
+            playerMP = playerMP - 3;
 
-            playerMP = playerMP - 4;
+            // Increase turn count by 1, and calculate damage done to rat
             turn++;
             ratHP = ratHP - playerATK;
 
-            // If rat isnt killed by attack, the rat then attacks. HP, MP, G, Turns are
-            // updated. Battle message is displayed
             if (ratHP > 0) {
                 if (ownHat == true) {
                     ratATK = (Math.round((ratATK * 8) / 10));
@@ -594,23 +662,17 @@ public class RatSimulatorTwo {
                 playerHP = playerHP - ratATK;
                 updateStats();
 
-                mainTextArea.setText("\nYou conjure a spell against the " + ratNames() + "rat for " + playerATK
+                mainTextArea.setText("\nYou cast shabu on the " + ratNames() + " rat and deal " + playerATK
                         + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") remains with " + ratHP
                         + " HP.\n\n\n\nThe " + ratNames() + "rat " + ratAttackDescription + " for " + ratATK
                         + " damage!");
-            }
-
-            // Else if Rat is killed by players attack, increase player's max stats, update
-            // HP, MP, G, turn values, and display rat killed message
-            else {
-                magicKill = true;
+            } else {
+                spellKill = "Shabu";
                 ratKilled();
                 updateStats();
             }
         }
 
-        // If rat isnt killed by player attack, and player's HP goes below 0 after
-        // exchanging damage, player dies. Displays death screen message
         while (playerHP <= 0) {
 
             die();
@@ -618,7 +680,49 @@ public class RatSimulatorTwo {
         }
     }
 
-    // If magic button pressed, calculates and displays what happens
+    public void shabu2() {
+
+        if (ratHP <= 0) {
+            generateRat();
+        }
+
+        else if (ratHP > 0) {
+            generateRatATK();
+            playerATK = rng.nextInt(51) + 120;
+            playerHPHealed = rng.nextInt(10) + 70;
+            playerHP = playerHP + playerHPHealed;
+            playerMP = playerMP - 6;
+
+            turn++;
+            ratHP = ratHP - playerATK;
+
+            if (ratHP > 0) {
+                if (ownHat == true) {
+                    ratATK = (Math.round((ratATK * 8) / 10));
+                }
+
+                playerHP = playerHP - ratATK;
+                updateStats();
+
+                mainTextArea.setText("\nYou cast shabu shabu on the " + ratNames() + " rat and deal " + playerATK
+                        + " damage, while restoring " + playerHPHealed + " HP!\n\n\n\nThe " + ratNames() + "rat (# "
+                        + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe " + ratNames() + "rat "
+                        + ratAttackDescription + " for " + ratATK + " damage!");
+            }
+
+            else {
+                spellKill = "Shabu Shabu";
+                ratKilled();
+                updateStats();
+            }
+        }
+        while (playerHP <= 0) {
+
+            die();
+            break;
+        }
+    }
+
     public void heal() {
 
         if (healTab == false) {
@@ -631,7 +735,7 @@ public class RatSimulatorTwo {
 
         if (healTab == true) {
             closeInventory();
-            // closeSpells
+            closeSpellTab();
         }
     }
 
@@ -646,15 +750,15 @@ public class RatSimulatorTwo {
         lickButton.setVisible(true);
         lickButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(final java.awt.event.MouseEvent evt) {
-                if (playerMP >= 1){
-                lick();}
-                else{
+                if (playerMP >= 1) {
+                    lick();
+                } else {
                     descriptionLabel.setText("You don't have enough mana!");
                 }
             }
 
             public void mouseEntered(final java.awt.event.MouseEvent evt) {
-                descriptionLabel.setText("Lick your wounds and heal 40 - 50 HP (Requires 1 MP)");
+                descriptionLabel.setText("Lick your wounds and heal  40 - 50 HP  (Requires 1 MP)");
             }
 
             public void mouseExited(final java.awt.event.MouseEvent evt) {
@@ -666,6 +770,63 @@ public class RatSimulatorTwo {
             ownLick = true;
             healPanel.add(lickButton);
         }
+
+        lick2Button = new JButton("Lick Your Wounds II");
+        lick2Button.setBackground(Color.black);
+        lick2Button.setForeground(Color.white);
+        lick2Button.setFocusPainted(false);
+        lick2Button.setVisible(true);
+        lick2Button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                if (playerMP >= 3) {
+                    lick2();
+                } else {
+                    descriptionLabel.setText("You don't have enough mana!");
+                }
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("Lick your wounds and heal  140 - 180 HP  (Requires 3 MP)");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        while ((ratsKilled >= 20) && (ownLick2 == false)) {
+            ownLick2 = true;
+            healPanel.add(lick2Button);
+        }
+
+        lick3Button = new JButton("Lick Your Wounds III");
+        lick3Button.setBackground(Color.black);
+        lick3Button.setForeground(Color.white);
+        lick3Button.setFocusPainted(false);
+        lick3Button.setVisible(true);
+        lick3Button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                if (playerMP >= 10) {
+                    lick3();
+                } else {
+                    descriptionLabel.setText("You don't have enough mana!");
+                }
+            }
+
+            public void mouseEntered(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("Lick your wounds and heal  300 - 450 HP  (Requires 10 MP)");
+            }
+
+            public void mouseExited(final java.awt.event.MouseEvent evt) {
+                descriptionLabel.setText("");
+            }
+        });
+
+        while ((ratsKilled >= 50) && (ownLick3 == false)) {
+            ownLick3 = true;
+            healPanel.add(lick3Button);
+        }
+
     }
 
     public void lick() {
@@ -676,7 +837,7 @@ public class RatSimulatorTwo {
 
         else if (ratHP > 0) {
             generateRatATK();
-            int playerHPHealed = rng.nextInt(11) + 40;
+            playerHPHealed = rng.nextInt(11) + 40;
             playerATK = 0;
 
             if (playerHP < playerMaxHP) {
@@ -684,16 +845,13 @@ public class RatSimulatorTwo {
             }
             playerMP--;
             // Prevents heal from going past max HP
-            while (playerHP > playerMaxHP) {
-                playerHP = playerMaxHP;
-            }
-            while (playerMP > playerMaxMP) {
-                playerMP = playerMaxMP;
-            }
 
             // Subtract MP after cast, increase turn, subtract rat damage, update HP, MP, G,
             // Turn. Display battle message
 
+            if (ownHat == true) {
+                ratATK = (Math.round((ratATK * 8) / 10));
+            }
             turn++;
             playerHP = playerHP - ratATK;
             updateStats();
@@ -705,6 +863,83 @@ public class RatSimulatorTwo {
         // If rat isnt killed by player attack, and player's HP goes below 0 after
         // exchanging damage, player dies. Displays death screen message
         while (playerHP <= 0) {
+
+            die();
+            break;
+        }
+    }
+
+    public void lick2() {
+
+        if (ratHP <= 0) {
+            generateRat();
+        }
+
+        else if (ratHP > 0) {
+            generateRatATK();
+            playerHPHealed = rng.nextInt(41) + 140;
+            playerATK = 0;
+
+            if (playerHP < playerMaxHP) {
+                playerHP = playerHP + (Math.round(playerHPHealed));
+            }
+            playerMP = playerMP - 5;
+
+            // Subtract MP after cast, increase turn, subtract rat damage, update HP, MP, G,
+            // Turn. Display battle message
+            if (ownHat == true) {
+                ratATK = (Math.round((ratATK * 8) / 10));
+            }
+            turn++;
+            playerHP = playerHP - ratATK;
+            updateStats();
+            mainTextArea.setText("\nYou lick your wounds and heal " + playerHPHealed + " HP!\n\n\nThe " + ratNames()
+                    + "rat (# " + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe " + ratNames() + "rat "
+                    + ratAttackDescription + " for " + ratATK + " damage!");
+        }
+
+        // If rat isnt killed by player attack, and player's HP goes below 0 after
+        // exchanging damage, player dies. Displays death screen message
+        while (playerHP <= 0) {
+
+            die();
+            break;
+        }
+    }
+
+    public void lick3() {
+
+        if (ratHP <= 0) {
+            generateRat();
+        }
+
+        else if (ratHP > 0) {
+            generateRatATK();
+            playerHPHealed = rng.nextInt(151) + 300;
+            playerATK = 0;
+
+            if (playerHP < playerMaxHP) {
+                playerHP = playerHP + (Math.round(playerHPHealed));
+            }
+            playerMP = playerMP - 10;
+
+            // Subtract MP after cast, increase turn, subtract rat damage, update HP, MP, G,
+            // Turn. Display battle message
+            if (ownHat == true) {
+                ratATK = (Math.round((ratATK * 8) / 10));
+            }
+            turn++;
+            playerHP = playerHP - ratATK;
+            updateStats();
+            mainTextArea.setText("\nYou lick your wounds and heal " + playerHPHealed + " HP!\n\n\nThe " + ratNames()
+                    + "rat (# " + ratsKilled + ") remains with " + ratHP + " HP.\n\n\n\nThe " + ratNames() + "rat "
+                    + ratAttackDescription + " for " + ratATK + " damage!");
+        }
+
+        // If rat isnt killed by player attack, and player's HP goes below 0 after
+        // exchanging damage, player dies. Displays death screen message
+        while (playerHP <= 0) {
+
             die();
             break;
         }
@@ -718,6 +953,13 @@ public class RatSimulatorTwo {
     // Updates values of text in infoLabel
     public void updateStats() {
 
+        while (playerHP > playerMaxHP) {
+            playerHP = playerMaxHP;
+        }
+        while (playerMP > playerMaxMP) {
+            playerMP = playerMaxMP;
+        }
+
         statsLabel.setText("HP: " + playerHP + " / " + playerMaxHP + "            MP: " + playerMP + " / " + playerMaxMP
                 + "            G: " + playerGold
                 + "                                                                                                                    Turn: "
@@ -725,8 +967,9 @@ public class RatSimulatorTwo {
     }
 
     public void openInventory() {
-        if (healTab == true) {
+        if ((healTab == true) || (spellTab == true)) {
             closeHealTab();
+            closeSpellTab();
         }
         inventoryOpen = true;
         inventoryPanel.setVisible(true);
@@ -734,24 +977,28 @@ public class RatSimulatorTwo {
                 && (ownPistol == false) && (ownHat == false)) {
             descriptionLabel.setText("You have nothing in your inventory...");
         }
+
         if (potionCount != 0) {
             usePotionButton.setText("Potion (x " + potionCount + ")");
             usePotionButton.setVisible(true);
         } else {
             usePotionButton.setVisible(false);
         }
+
         if (mushroomCount != 0) {
             useMushroomButton.setText("Mushroom (x " + mushroomCount + ")");
             useMushroomButton.setVisible(true);
         } else {
             useMushroomButton.setVisible(false);
-            if (tendyCount != 0) {
-                useTendyButton.setText("Tendy (x " + tendyCount + ")");
-                useTendyButton.setVisible(true);
-            } else {
-                useTendyButton.setVisible(false);
-            }
         }
+
+        if (tendyCount != 0) {
+            useTendyButton.setText("Tendy (x " + tendyCount + ")");
+            useTendyButton.setVisible(true);
+        } else {
+            useTendyButton.setVisible(false);
+        }
+
         if (ownPencil == true) {
             usePencilButton.setVisible(true);
         }
@@ -814,6 +1061,9 @@ public class RatSimulatorTwo {
     // Setting up shop interface
     public void spawnShop() {
 
+        closeHealTab();
+        closeSpellTab();
+
         mainTextArea.setText(
                 "\nYou find a rat vendor.\n\n\nSqueek Squeek Squeek Squeek\n(Care to examine the stock upheld within my emporium, human?)\n\n\n\n\n\nWhat will you do?");
         attackButtonPanel.add(shopButton);
@@ -822,7 +1072,7 @@ public class RatSimulatorTwo {
         leaveButton.setVisible(true);
         continueButton.setVisible(false);
         attackButton.setVisible(false);
-        magicButton.setVisible(false);
+        spellButton.setVisible(false);
         healButton.setVisible(false);
         inventoryButton.setVisible(false);
         inventoryPanel.setVisible(false);
@@ -1174,28 +1424,33 @@ public class RatSimulatorTwo {
     // When you kill a rat and continue: the rats death display message
     public void killedRatContinue() {
 
-        if (magicKill == true) {
-            mainTextArea.setText("\nYou conjure a spell against the " + ratNames() + "rat for " + playerATK
-                    + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") dies and drops " + ratGold
-                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 4))
-                    + "!\n\nYour max MP increases by 1!");
-        } else if (magicKill == false) {
+        if (spellKill == "") {
             mainTextArea.setText("\nYou " + playerWeaponVerb + " the " + ratNames() + "rat for " + playerATK
                     + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") dies and drops " + ratGold
                     + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 4))
                     + "!\n\nYour max MP increases by 1!");
-        } else {
-            mainTextArea.setText("you killed the rat");
+        } else if (spellKill == "Shabu") {
+            mainTextArea.setText("\nYou cook the " + ratNames() + "rat for " + playerATK
+                    + " damage!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") dies and drops " + ratGold
+                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 4))
+                    + "!\n\nYour max MP increases by 1!");
+        }else if (spellKill == "Shabu Shabu") {
+            mainTextArea.setText("\nYou cook and eat the " + ratNames() + "rat for " + playerATK
+                    + " damage, while restoring " + playerHPHealed +" HP!\n\n\n\nThe " + ratNames() + "rat (# " + ratsKilled + ") dies and drops " + ratGold
+                    + " gold.\n\n\nYour max HP increases by " + (15 + (ratsKilled / 4))
+                    + "!\n\nYour max MP increases by 1!");
         }
 
         ratsKilled++;
 
         attackButton.setVisible(false);
-        magicButton.setVisible(false);
+        spellButton.setVisible(false);
         healButton.setVisible(false);
         inventoryButton.setVisible(false);
         continueButton.setVisible(true);
         closeHealTab();
+        closeSpellTab();
+        closeInventory();
 
         shopRNG = rng.nextInt(3);
 
@@ -1205,7 +1460,7 @@ public class RatSimulatorTwo {
     public void continueRatsShop() {
 
         attackButton.setVisible(true);
-        magicButton.setVisible(true);
+        spellButton.setVisible(true);
         healButton.setVisible(true);
         inventoryButton.setVisible(true);
         continueButton.setVisible(false);
@@ -1276,7 +1531,7 @@ public class RatSimulatorTwo {
             ratHP = rng.nextInt(10) + (4 * ratsKilled) * 1;
             // ratATK = rng.nextInt(10) + (5 * ratsKilled) / 4;
             ratGold = 4 + rng.nextInt(3) * ratsKilled / 2;
-            ratAttackDescription = "uses an orchestras magic on you";
+            ratAttackDescription = "uses an orchestras spell on you";
             return "yellow ";
         } else if ((ratRNG >= 55) && (ratRNG < 60)) {
             // HP 3, ATK 6 == 9
@@ -1928,13 +2183,9 @@ public class RatSimulatorTwo {
             case "Stab":
                 attackRat();
                 break;
-            case "Magic":
-                if (playerMP >= 4) {
-                    magicAttackRat();
-                    break;
-                } else {
-                    break;
-                }
+            case "Spells":
+                spell();
+                break;
             case "Heal":
                 heal();
                 break;
